@@ -1,10 +1,11 @@
 
-<h1>"WithTopia" </h1>
-<h1>익명으로 즐기는 화상채팅!</h1>
+<h1 style="text-align: center; font-size: 67px">WithTopia </h1>
+<h1 style="text-align: center;">익명으로 즐기는 화상채팅!</h1>
+
 
 ## Introduction of Project
 ### What
-- [배포 사이트]()
+- [배포 사이트](https://warmwinter.co.kr)
 
 ### When
 - 2022.08.26 ~ 
