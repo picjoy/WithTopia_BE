@@ -1,5 +1,6 @@
 
-<h6># "WithTopia" :: 익명으로 즐기는 화상채팅!</h6>
+<h1>"WithTopia" </h1>
+<h1>익명으로 즐기는 화상채팅!</h1>
 
 ## Introduction of Project
 ### What
