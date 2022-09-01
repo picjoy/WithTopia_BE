@@ -27,32 +27,7 @@ public class MemberService {
 //  private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final TokenProvider tokenProvider;
 
-  @Transactional
-  public ResponseDto<?> createMember(MemberRequestDto requestDto) {
-    if (null != isPresentMember(requestDto.getNickname())) {
-      return ResponseDto.fail("DUPLICATED_NICKNAME",
-          "중복된 닉네임 입니다.");
-    }
 
-    if (!requestDto.getPassword().equals(requestDto.getPasswordConfirm())) {
-      return ResponseDto.fail("PASSWORDS_NOT_MATCHED",
-          "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-    }
-
-    Member member = Member.builder()
-            .nickName(requestDto.getNickname())
-                .password(passwordEncoder.encode(requestDto.getPassword()))
-                    .build();
-    memberRepository.save(member);
-    return ResponseDto.success(
-        MemberResponseDto.builder()
-            .id(member.getMemberId())
-            .nickname(member.getNickName())
-            .createdAt(member.getCreatedAt())
-            .modifiedAt(member.getModifiedAt())
-            .build()
-    );
-  }
 
   @Transactional
   public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
@@ -122,7 +97,7 @@ public class MemberService {
 
   @Transactional(readOnly = true)
   public Member isPresentMember(String nickname) {
-    Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
+    Optional<Member> optionalMember = memberRepository.findByNickName(nickname);
     return optionalMember.orElse(null);
   }
 
@@ -130,6 +105,11 @@ public class MemberService {
     response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
     response.addHeader("Refresh-Token", tokenDto.getRefreshToken());
     response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
+  }
+
+  public void signUp(MemberRequestDto memberDTO) {
+    Member member = new Member(memberDTO);
+    memberRepository.save(member);
   }
 
 }

@@ -3,7 +3,6 @@ package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.MemberService;
 import com.four.withtopia.dto.request.LoginRequestDto;
-import com.four.withtopia.dto.request.MemberRequestDto;
 import com.four.withtopia.dto.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,10 +20,6 @@ public class MemberController {
 
   private final MemberService memberService;
 
-  @RequestMapping(value = "/api/member/signup", method = RequestMethod.POST)
-  public ResponseDto<?> signup(@RequestBody @Valid MemberRequestDto requestDto) {
-    return memberService.createMember(requestDto);
-  }
 
   @RequestMapping(value = "/api/member/login", method = RequestMethod.POST)
   public ResponseDto<?> login(@RequestBody @Valid LoginRequestDto requestDto,
