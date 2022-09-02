@@ -2,13 +2,16 @@ package com.four.withtopia.api.service;
 
 import com.four.withtopia.db.domain.EmailAuth;
 import com.four.withtopia.db.repository.EmailAuthRepository;
+import com.four.withtopia.dto.request.EmailAuthRequestDto;
 import com.four.withtopia.util.MailUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 import java.util.Random;
 
 @Service("mss")
@@ -68,7 +71,26 @@ public class MailSendService {
         return authKey;
     }
 
-    public void saveAuth(EmailAuth emailAuth) {
-        emailAuthRepository.save(emailAuth);
+    public ResponseEntity<?> saveAuth(EmailAuth emailAuth) {
+
+        EmailAuth origin = emailAuthRepository.findByEmail(emailAuth.getEmail());
+        if (!(origin == null)) {
+            origin.Update(emailAuth.getAuth());
+            emailAuthRepository.save(emailAuth);
+        } else {
+            emailAuthRepository.save(emailAuth);
+        }
+        return ResponseEntity.ok("메일발송이 완료되었습니다.");
+    }
+
+    public ResponseEntity<?> checkAuthKey(EmailAuthRequestDto requestDto) {
+        boolean confirm = false;
+        EmailAuth origin = emailAuthRepository.findByEmail(requestDto.getEmail());
+        if (!(origin == null)) {
+            if (Objects.equals(origin.getAuth(), requestDto.getAuthKey())){
+                confirm = true;
+            }
+        }
+        return ResponseEntity.ok(confirm);
     }
 }

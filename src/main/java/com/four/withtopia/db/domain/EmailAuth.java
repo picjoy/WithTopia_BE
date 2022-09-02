@@ -26,4 +26,8 @@ public class EmailAuth {
         this.email = email;
         this.Auth = authKey;
     }
+
+    public void Update(String auth){
+        this.Auth = auth;
+    }
 }
