@@ -23,10 +23,10 @@ public class Member extends Timestamped {
     @Column(nullable = false)
     private String nickName;
 
-    @Column(nullable = false)
+    @Column
     private String email;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(nullable = false)
@@ -34,6 +34,11 @@ public class Member extends Timestamped {
 
     @Column(nullable = false)
     private boolean delete;
+
+    @Column
+    private String kakaoId;
+    @Column
+    private String googleId;
 
     @Override
     public boolean equals(Object o) {
