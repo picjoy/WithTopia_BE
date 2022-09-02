@@ -39,12 +39,11 @@ jobs:
         
     # properties 설정 파일 쓰기
     - name: Generate Environment Variables File for Properties
-      uses: microsoft/variable-substitution@v1
-      with:
-       files: ${{ env.RESOURCE_PATH }}
+      run: |
+          echo "spring.datasource.username=$TEST" > application.properties.b64
+          base64 -d -i application.properties.b64 > application.properties
       env:
-       cloud.aws.credentials.accessKey: ${{ secrets.AWS_ACCESS }}
-       cloud.aws.credentials.secretKey: ${{ secrets.AWS_SECRET }}
+          TEST: ${{ secrets.SECRET_PROPORTIES }}
     
     
     # 권한 재설정
