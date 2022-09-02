@@ -1,11 +1,12 @@
 package com.four.withtopia.db.domain;
 
-import com.four.withtopia.dto.request.MemberRequestDto;
 import com.four.withtopia.util.Timestamped;
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @NoArgsConstructor
 @Builder
@@ -32,8 +33,7 @@ public class Member extends Timestamped {
     private String profileImage;
 
     @Column(nullable = false)
-
-    private boolean delete;
+    private boolean isDelete = false;
 
     @Column
     private String kakaoId;
@@ -52,14 +52,6 @@ public class Member extends Timestamped {
         return memberId != null && Objects.equals(memberId, member.memberId);
     }
 
-
-    public Member(MemberRequestDto memberDTO) {
-        this.nickName = memberDTO.getNickname();
-        this.email = memberDTO.getEmail();
-        this.password = memberDTO.getPassword();
-        this.profileImage = "asdfasdfasdfasdf";
-        this.isDelete = false;
-    }
 
 //    @Override
 //    public boolean equals(Object o) {
