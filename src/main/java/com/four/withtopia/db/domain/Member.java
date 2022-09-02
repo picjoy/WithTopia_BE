@@ -22,18 +22,35 @@ public class Member extends Timestamped {
     @Column(nullable = false)
     private String nickName;
 
-    @Column(nullable = false)
+    @Column
     private String email;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(nullable = false)
     private String profileImage;
 
     @Column(nullable = false)
-    private boolean isDelete;
 
+    private boolean delete;
+
+    @Column
+    private String kakaoId;
+    @Column
+    private String googleId;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+            return false;
+        }
+        Member member = (Member) o;
+        return memberId != null && Objects.equals(memberId, member.memberId);
+    }
 
 
     public Member(MemberRequestDto memberDTO) {
