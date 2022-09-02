@@ -32,32 +32,7 @@ public class MemberService {
   private final TokenProvider tokenProvider;
   private final KakaoService kakaoService;
 
-  @Transactional
-  public ResponseDto<?> createMember(MemberRequestDto requestDto) {
-    if (null != isPresentMember(requestDto.getNickname())) {
-      return ResponseDto.fail("DUPLICATED_NICKNAME",
-          "중복된 닉네임 입니다.");
-    }
 
-    if (!requestDto.getPassword().equals(requestDto.getPasswordConfirm())) {
-      return ResponseDto.fail("PASSWORDS_NOT_MATCHED",
-          "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-    }
-
-    Member member = Member.builder()
-            .nickName(requestDto.getNickname())
-                .password(passwordEncoder.encode(requestDto.getPassword()))
-                    .build();
-    memberRepository.save(member);
-    return ResponseDto.success(
-        MemberResponseDto.builder()
-            .id(member.getMemberId())
-            .nickname(member.getNickName())
-            .createdAt(member.getCreatedAt())
-            .modifiedAt(member.getModifiedAt())
-            .build()
-    );
-  }
 
   @Transactional
   public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
@@ -163,4 +138,5 @@ public class MemberService {
     TokenDto tokenDto = tokenProvider.generateTokenDto(socialUser);
     tokenToHeaders(tokenDto, response);
   }
+
 }

@@ -27,6 +27,7 @@ out/
 !**/src/test/**/out/
 application.properties
 application-jisung.properties
+application-wonyoung.properties
 
 ### NetBeans ###
 /nbproject/private/
