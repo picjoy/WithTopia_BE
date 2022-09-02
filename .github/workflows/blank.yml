@@ -40,8 +40,8 @@ jobs:
     # properties 설정 파일 쓰기
     - name: Generate Environment Variables File for Properties
       run: |
-        touch src/main/resourcesapplication.properties
-        echo "${{ secrets.SECRET_PROPORTIES }}" > src/main/resources/application.properties
+        touch ./src/main/resourcesapplication.properties
+        echo "${{ secrets.SECRET_PROPORTIES }}" > ./src/main/resources/application.properties
       
     # 권한 재설정
     - name: Run chmod to make gradlew executable
