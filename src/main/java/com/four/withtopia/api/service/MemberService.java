@@ -6,7 +6,6 @@ import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.KakaoUserInfoDto;
 import com.four.withtopia.dto.request.LoginRequestDto;
-import com.four.withtopia.dto.request.MemberRequestDto;
 import com.four.withtopia.dto.request.TokenDto;
 import com.four.withtopia.dto.response.MemberResponseDto;
 import com.four.withtopia.dto.response.ResponseDto;
@@ -139,6 +138,11 @@ public class MemberService {
   }
 
   public ResponseEntity<?> createMember(MemberRequestDto requestDto) {
-    return ResponseEntity.ok("hello");
+    if (requestDto.getAuthKey() == null) {
+      ResponseEntity.ok("이메일 인증번호를 적어주세요!");
+    }
+    Member member = new Member(requestDto);
+    memberRepository.save(member);
+    return ResponseEntity.ok("success");
   }
 }

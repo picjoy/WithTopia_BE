@@ -18,8 +18,5 @@ public class MemberRequestDto {
   private String passwordConfirm;
   private String authKey;
 
-  public void setAuthKey(String authKey) {
-    this.authKey = authKey;
-  }
 
 }
