@@ -140,11 +140,11 @@ public class MemberService {
     return ResponseEntity.ok(responseDto);
   }
 
-  public ResponseEntity<?> googleLogin(String code, HttpServletResponse response) throws JsonProcessingException {
-    // 인가코드 받아서 구글 엑세스 토큰 받기
-    String googleAccessToken =
-    return ResponseEntity.ok(responseDto);
-  }
+//  public ResponseEntity<?> googleLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+//    // 인가코드 받아서 구글 엑세스 토큰 받기
+//    String googleAccessToken =
+//    return ResponseEntity.ok(responseDto);
+//  }
 
   @Transactional(readOnly = true)
   public Member isPresentMember(String nickname) {

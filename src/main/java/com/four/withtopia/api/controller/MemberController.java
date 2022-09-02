@@ -47,8 +47,8 @@ public class MemberController {
     return memberService.kakaoLogin(code, response);
   }
 
-  @RequestMapping(value = "/member/login/google", method = RequestMethod.GET)
-  public ResponseEntity<?> googleLogin(@RequestParam(name="code") String code, HttpServletResponse response) throws JsonProcessingException {
-    return memberService.googleLogin(code, response);
-  }
+//  @RequestMapping(value = "/member/login/google", method = RequestMethod.GET)
+//  public ResponseEntity<?> googleLogin(@RequestParam(name="code") String code, HttpServletResponse response) throws JsonProcessingException {
+//    return memberService.googleLogin(code, response);
+//  }
 }

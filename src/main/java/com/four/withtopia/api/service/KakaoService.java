@@ -67,7 +67,7 @@ public class KakaoService {
     KakaoUserInfoDto getKakaoUserInfo(String token) throws JsonProcessingException {
         // Http 헤더
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer" + token);
+        headers.add("Authorization", "Bearer " + token);
         headers.add("Content-type","application/x-www-form-urlencoded;charset=utf-8");
         // Http 요청
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
@@ -116,6 +116,7 @@ public class KakaoService {
                 .nickName(kakaoUserInfoDto.getNickName() + "_kakao_" + usernameId)
                 .email(kakaoUserInfoDto.getEmail())
                 .profileImage(randomImg.get().getProfileIamge())
+                .delete(false)
                 .build();
     }
 }
