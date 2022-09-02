@@ -26,4 +26,15 @@ public class MemberResponseDto {
             .modifiedAt(member.getModifiedAt())
             .build();
   }
+  public static MemberResponseDto createSocialMemberResponseDto(Member member){
+
+    String nickname[] = member.getNickName().split("_");
+
+    return MemberResponseDto.builder()
+            .id(member.getMemberId())
+            .nickname(nickname[0])
+            .createdAt(member.getCreatedAt())
+            .modifiedAt(member.getModifiedAt())
+            .build();
+  }
 }

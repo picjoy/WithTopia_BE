@@ -41,11 +41,11 @@ public class KakaoService {
         headers.add("Content-type","application/x-www-form-urlencoded;charset=utf-8");
         // Http 바디
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("grant_type", "authorization_cod");
+        body.add("grant_type", "authorization_code");
         body.add("client_id", CLIENT_ID);
         body.add("redirect_uri", REDIRECT_URI);
-        body.add("code", code);
         body.add("client_secret", CLIENT_SECRET);
+        body.add("code", code);
         // Http 요청
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body,headers);
         RestTemplate template = new RestTemplate();
@@ -57,18 +57,19 @@ public class KakaoService {
         );
         // kakao Access Token
         String responseBody = response.getBody();
+        System.out.println("responseBody = " + responseBody);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        System.out.println("kakao access token = " + jsonNode.asText());
-        return jsonNode.asText();
+        return jsonNode.get("access_token").asText();
     }
 
     // 카카오에서 유저 인포 받아오기
-    KakaoUserInfoDto getKakaoUserInfo(String token) throws JsonProcessingException {
+    KakaoUserInfoDto getKakaoUserInfo(String kakaoAccessToken) throws JsonProcessingException {
         // Http 헤더
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + token);
+        headers.add("Authorization", "Bearer " + kakaoAccessToken);
         headers.add("Content-type","application/x-www-form-urlencoded;charset=utf-8");
+        System.out.println("kakaoAccessToken = " + kakaoAccessToken);
         // Http 요청
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
         RestTemplate template = new RestTemplate();
@@ -80,9 +81,9 @@ public class KakaoService {
         );
         // kakao user info
         String responseBody = response.getBody();
+        System.out.println("responseBody = " + responseBody);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        System.out.println("kakao user info = " + jsonNode.asText());
         return KakaoUserInfoDto.createKakaoUserInfo(jsonNode);
     }
 
@@ -115,7 +116,7 @@ public class KakaoService {
                 .kakaoId(kakaoUserInfoDto.getKakaoId())
                 .nickName(kakaoUserInfoDto.getNickName() + "_kakao_" + usernameId)
                 .email(kakaoUserInfoDto.getEmail())
-                .profileImage(randomImg.get().getProfileIamge())
+                .profileImage("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/e3f569cf-b23a-4462-a0e1-9caa51e36aca")
                 .build();
     }
 }

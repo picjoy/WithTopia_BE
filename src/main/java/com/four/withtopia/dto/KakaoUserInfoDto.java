@@ -18,8 +18,8 @@ public class KakaoUserInfoDto {
     public static KakaoUserInfoDto createKakaoUserInfo(JsonNode jsonNode){
         return KakaoUserInfoDto.builder()
                 .kakaoId(jsonNode.get("id").asText())
-                .nickName(jsonNode.get("nickname").asText())
-                .email(jsonNode.get("email").asText())
+                .nickName(jsonNode.get("properties").get("nickname").asText())
+                .email(jsonNode.get("kakao_account").get("email").asText())
                 .build();
     }
 }
