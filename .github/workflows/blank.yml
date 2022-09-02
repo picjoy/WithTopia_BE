@@ -39,9 +39,10 @@ jobs:
         
     # properties 설정 파일 쓰기
     - name: Generate Environment Variables File for Properties
+      working-directory: /src/main/resources
       run: |
-        touch ./src/main/resources/application.properties
-        echo "${{ secrets.SECRET_PROPORTIES }}" > ./src/main/resources/application.properties
+        touch application.properties
+        echo "${{ secrets.SECRET_PROPORTIES }}" > application.properties
       shell: bash
       
     # 권한 재설정
