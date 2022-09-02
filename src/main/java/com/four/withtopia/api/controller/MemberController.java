@@ -4,6 +4,7 @@ package com.four.withtopia.api.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.four.withtopia.api.service.MemberService;
 import com.four.withtopia.dto.request.LoginRequestDto;
+import com.four.withtopia.dto.request.MemberRequestDto;
 import com.four.withtopia.dto.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class MemberController {
   private final MemberService memberService;
 
   @RequestMapping(value = "/member/signup", method = RequestMethod.POST)
-  public ResponseDto<?> signup(@RequestBody @Valid MemberRequestDto requestDto) {
+  public ResponseEntity<?> signup(@RequestBody @Valid MemberRequestDto requestDto) {
     return memberService.createMember(requestDto);
   }
 

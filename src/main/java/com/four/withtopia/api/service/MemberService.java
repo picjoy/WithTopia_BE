@@ -1,6 +1,5 @@
 package com.four.withtopia.api.service;
 
-import antlr.Token;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
@@ -139,4 +138,7 @@ public class MemberService {
     tokenToHeaders(tokenDto, response);
   }
 
+  public ResponseEntity<?> createMember(MemberRequestDto requestDto) {
+    return ResponseEntity.ok("hello");
+  }
 }

@@ -116,7 +116,6 @@ public class KakaoService {
                 .nickName(kakaoUserInfoDto.getNickName() + "_kakao_" + usernameId)
                 .email(kakaoUserInfoDto.getEmail())
                 .profileImage(randomImg.get().getProfileIamge())
-                .delete(false)
                 .build();
     }
 }
