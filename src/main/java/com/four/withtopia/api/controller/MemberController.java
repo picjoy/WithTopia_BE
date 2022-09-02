@@ -43,7 +43,7 @@ public class MemberController {
   }
 
   @RequestMapping(value = "/member/login/kakao", method = RequestMethod.GET)
-  public ResponseEntity<?> kakaoLogin(@RequestParam(name="code") String code, HttpServletResponse response) throws JsonProcessingException {
+  public ResponseEntity<?> kakaoLogin(@RequestParam(value="code") String code, HttpServletResponse response) throws JsonProcessingException {
     return memberService.kakaoLogin(code, response);
   }
 

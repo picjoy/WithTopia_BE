@@ -108,7 +108,7 @@ public class MemberService {
     // 로그인 - 토큰 헤더에 넣어주기
     socialLogin(createMember, response);
     // MemberResponseDto
-    MemberResponseDto responseDto = MemberResponseDto.createMemberResponseDto(createMember);
+    MemberResponseDto responseDto = MemberResponseDto.createSocialMemberResponseDto(createMember);
 
     return ResponseEntity.ok(responseDto);
   }
