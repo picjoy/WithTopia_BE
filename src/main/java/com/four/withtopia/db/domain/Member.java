@@ -40,6 +40,13 @@ public class Member extends Timestamped {
     @Column
     private String googleId;
 
+    public Member(MemberRequestDto requestDto) {
+        this.nickName = requestDto.getNickname();
+        this.email = requestDto.getEmail();
+        this.password = requestDto.getPassword();
+        this.profileImage = "https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/e3f569cf-b23a-4462-a0e1-9caa51e36aca";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -76,11 +76,11 @@ public class MailSendService {
         EmailAuth origin = emailAuthRepository.findByEmail(emailAuth.getEmail());
         if (!(origin == null)) {
             origin.Update(emailAuth.getAuth());
-            emailAuthRepository.save(emailAuth);
+            emailAuthRepository.save(origin);
         } else {
             emailAuthRepository.save(emailAuth);
         }
-        return ResponseEntity.ok("메일발송이 완료되었습니다.");
+        return ResponseEntity.ok("success");
     }
 
     public ResponseEntity<?> checkAuthKey(EmailAuthRequestDto requestDto) {
