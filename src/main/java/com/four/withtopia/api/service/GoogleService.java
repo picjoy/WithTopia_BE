@@ -7,6 +7,7 @@ import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.ProfileImage;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.ProfileImageRepository;
+import com.four.withtopia.dto.request.GoogleUserInfoDto;
 import com.four.withtopia.dto.request.KakaoUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,17 +26,16 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class KakaoService {
-
+public class GoogleService {
     private final MemberRepository memberRepository;
     private final ProfileImageRepository profileImageRepository;
 
-    @Value("${spring.security.oauth2.client.registration.kakao.client-id}") private String CLIENT_ID; // rest APi 키
-    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}") private String CLIENT_SECRET ; // 시크릿 키
-    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}") private String REDIRECT_URI; // 리다이렉트 uri
+    @Value("${spring.security.oauth2.client.registration.google.client-id}") private String CLIENT_ID; // rest APi 키
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}") private String CLIENT_SECRET ; // 시크릿 키
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}") private String REDIRECT_URI; // 리다이렉트 uri
 
     // 카카오에서 엑세스 토큰 받아오기
-    String getKakaoAccessToken(String code) throws JsonProcessingException {
+    String getGoogleAccessToken(String code) throws JsonProcessingException {
         // Http 헤더
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type","application/x-www-form-urlencoded;charset=utf-8");
@@ -47,12 +47,12 @@ public class KakaoService {
         body.add("client_secret", CLIENT_SECRET);
         body.add("code", code);
         // Http 요청
-        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body,headers);
+        HttpEntity<MultiValueMap<String, String>> googleTokenRequest = new HttpEntity<>(body,headers);
         RestTemplate template = new RestTemplate();
         ResponseEntity<String> response = template.exchange(
-                "https://kauth.kakao.com/oauth/token",
+                "https://oauth2.googleapis.com/token",
                 HttpMethod.POST,
-                kakaoTokenRequest,
+                googleTokenRequest,
                 String.class
         );
         // kakao Access Token
@@ -64,19 +64,19 @@ public class KakaoService {
     }
 
     // 카카오에서 유저 인포 받아오기
-    KakaoUserInfoDto getKakaoUserInfo(String kakaoAccessToken) throws JsonProcessingException {
+    GoogleUserInfoDto getGoogleUserInfo(String googleAccessToken) throws JsonProcessingException {
         // Http 헤더
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + kakaoAccessToken);
+        headers.add("Authorization", "Bearer " + googleAccessToken);
         headers.add("Content-type","application/x-www-form-urlencoded;charset=utf-8");
-        System.out.println("kakaoAccessToken = " + kakaoAccessToken);
+        System.out.println("googleAccessToken = " + googleAccessToken);
         // Http 요청
-        HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
+        HttpEntity<MultiValueMap<String, String>> googleUserInfoRequest = new HttpEntity<>(headers);
         RestTemplate template = new RestTemplate();
         ResponseEntity<String> response = template.exchange(
-                "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.POST,
-                kakaoUserInfoRequest,
+                "https://www.googleapis.com/oauth2/v1/userinfo",
+                HttpMethod.GET,
+                googleUserInfoRequest,
                 String.class
         );
         // kakao user info
@@ -84,27 +84,27 @@ public class KakaoService {
         System.out.println("responseBody = " + responseBody);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return KakaoUserInfoDto.createKakaoUserInfo(jsonNode);
+        return GoogleUserInfoDto.createGoogleUserInfoDto(jsonNode);
     }
 
     // 필요시 회원가입 하기
     @Transactional
-    Member createKakaoMember(KakaoUserInfoDto kakaoUserInfo) {
+    Member createGoogleMember(GoogleUserInfoDto googleUserInfo) {
         // DB 에 중복된 Kakao Id 가 있는지 확인
-        String kakaoUserId = kakaoUserInfo.getKakaoId();
-        Member kakaoUser = memberRepository.findByKakaoId(kakaoUserId);
+        String googleUserId = googleUserInfo.getGoogleId();
+        Member googleUser = memberRepository.findByGoogleId(googleUserId);
 
         // 없으면 회원가입 진행
-        if (kakaoUser == null) {
-            Member newMember = ConvertingKakaoUserToMember(kakaoUserInfo);
+        if (googleUser == null) {
+            Member newMember = ConvertingGoogleUserToMember(googleUserInfo);
             return memberRepository.save(newMember);
         }
 
-        return kakaoUser;
+        return googleUser;
     }
 
     // 카카오 유저를 우리 회원 양식으로 맞춰 넣기
-    public Member ConvertingKakaoUserToMember(KakaoUserInfoDto kakaoUserInfoDto){
+    public Member ConvertingGoogleUserToMember(GoogleUserInfoDto googleUserInfo){
         // 유저네임에 랜덤한 id 붙여주기
         String usernameId = UUID.randomUUID().toString();
         // 유저 이미지를 랜덤하게 부여하기
@@ -113,9 +113,9 @@ public class KakaoService {
         Optional<ProfileImage> randomImg = profileImageRepository.findById(randomImgId);
 
         return Member.builder()
-                .kakaoId(kakaoUserInfoDto.getKakaoId())
-                .nickName(kakaoUserInfoDto.getNickName() + "_kakao_" + usernameId)
-                .email(kakaoUserInfoDto.getEmail())
+                .kakaoId(googleUserInfo.getGoogleId())
+                .nickName(googleUserInfo.getNickName() + "_google_" + usernameId)
+                .email(googleUserInfo.getEmail())
                 .profileImage("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/e3f569cf-b23a-4462-a0e1-9caa51e36aca")
                 .build();
     }
