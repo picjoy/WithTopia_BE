@@ -11,9 +11,11 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 public class ProfileImage {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long imageId;
+
     @Column(nullable = false)
     private String profileIamge;
 }
