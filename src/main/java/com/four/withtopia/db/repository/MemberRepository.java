@@ -21,5 +21,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Member findByKakaoId(String kakaoId);
 
-
+    Member findByGoogleId(String googleId);
 }

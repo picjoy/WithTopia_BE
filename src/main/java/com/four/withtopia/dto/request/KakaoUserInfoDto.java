@@ -1,4 +1,4 @@
-package com.four.withtopia.dto;
+package com.four.withtopia.dto.request;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;

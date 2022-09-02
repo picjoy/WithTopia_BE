@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
+import com.four.withtopia.dto.request.*;
 import com.four.withtopia.dto.KakaoUserInfoDto;
 import com.four.withtopia.dto.request.LoginRequestDto;
 import com.four.withtopia.dto.request.TokenDto;
@@ -30,7 +31,7 @@ public class MemberService {
   private final TokenProvider tokenProvider;
   private final KakaoService kakaoService;
 
-
+  private final GoogleService googleService;
 
   @Transactional
   public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
@@ -113,11 +114,20 @@ public class MemberService {
     return ResponseEntity.ok(responseDto);
   }
 
-//  public ResponseEntity<?> googleLogin(String code, HttpServletResponse response) throws JsonProcessingException {
-//    // 인가코드 받아서 구글 엑세스 토큰 받기
-//    String googleAccessToken =
-//    return ResponseEntity.ok(responseDto);
-//  }
+  public ResponseEntity<?> googleLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+    // 인가코드 받아서 구글 엑세스 토큰 받기
+    String googleAccessToken = googleService.getGoogleAccessToken(code);
+    // 구글 엑세스 토큰으로 유저 정보 받아오기
+    GoogleUserInfoDto googleUserInfo = googleService.getGoogleUserInfo(googleAccessToken);
+    // 회원가입 필요시 회원가입
+    Member createMember = googleService.createGoogleMember(googleUserInfo);
+    // 로그인 - 토큰 헤더에 넣어주기
+    socialLogin(createMember, response);
+    // MemberResponseDto
+    MemberResponseDto responseDto = MemberResponseDto.createSocialMemberResponseDto(createMember);
+
+    return ResponseEntity.ok(responseDto);
+  }
 
   @Transactional(readOnly = true)
   public Member isPresentMember(String nickname) {
