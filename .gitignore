@@ -28,6 +28,7 @@ out/
 application.properties
 application-jisung.properties
 application-wonyoung.properties
+application.yml
 
 ### NetBeans ###
 /nbproject/private/
