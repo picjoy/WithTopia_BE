@@ -7,6 +7,7 @@ import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.*;
 import com.four.withtopia.dto.KakaoUserInfoDto;
 import com.four.withtopia.dto.request.LoginRequestDto;
+import com.four.withtopia.dto.request.MemberRequestDto;
 import com.four.withtopia.dto.request.TokenDto;
 import com.four.withtopia.dto.response.MemberResponseDto;
 import com.four.withtopia.dto.response.ResponseDto;
