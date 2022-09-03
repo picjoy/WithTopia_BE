@@ -42,9 +42,28 @@ jobs:
       uses: microsoft/variable-substitution@v1
       with:
         files: ${{ env.RESOURCE_PATH }}
-      env: |
-        touch application.properties
-        echo "${{ secrets.SECRET_PROPORTIES }}" > application.properties
+      env: 
+        spring.datasource.url: ${{secret.DATABASE_URL}}
+        spring.datasource.username: ${{secret.DATA_USERNAME}}
+        spring.datasource.password: ${{secret.DATA_PASSWORD}}
+        jwt.secret: ${{secret.JWT_SECRET}}
+        cloud.aws.credentials.accessKey: ${{secret.AWS_ACCESS}}
+        cloud.aws.credentials.secretKey: ${{secret.AWS_SECRET}}
+        cloud.aws.s3.bucket:  ${{ env.S3_BUCKET_NAME }}
+        cloud.aws.region.static:  ${{ env.AWS_REGION }}
+        spring.mail.username: ${{secret.MAIL_USERNAME}}
+        spring.mail.password: ${{secret.MAIL_PASSWORD}}
+        spring.security.oauth2.client.registration.kakao.client-id: ${{secret.KAKAO_ID}}
+        spring.security.oauth2.client.registration.kakao.redirect-uri: ${{secret.REDIRECT_URI}}
+        spring.security.oauth2.client.registration.kakao.client-secret: ${{secret.CLIEN_SECRET}}
+        spring.security.oauth2.client.registration.kakao.authorization-grant-type: ${{secret.AUTHORIZATION_GRANT_TYPE}}
+        spring.security.oauth2.client.registration.kakao.scope: ${{secret.KAKAO_SCOPE}}
+        spring.security.oauth2.client.registration.kakao.client-name: ${{secret.KAKAO_CLIENT_NAME}}
+        spring.security.oauth2.client.provider.kakao.authorization-uri: ${{secret.AUTHORIZATION_URI}}
+        spring.security.oauth2.client.provider.kakao.token-uri: ${{secret.TOKEN_URI}}
+        spring.security.oauth2.client.provider.kakao.user-info-uri: ${{secret.USER_INFO_URI}}
+        spring.security.oauth2.client.provider.kakao.user-name-attribute: ${{secret.USER_NAME_ATTRIBUTE}}
+        
       
     # 권한 재설정
     - name: Run chmod to make gradlew executable
