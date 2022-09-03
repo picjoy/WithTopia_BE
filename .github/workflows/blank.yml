@@ -43,26 +43,26 @@ jobs:
       with:
         files: ${{ env.RESOURCE_PATH }}
       env: 
-        spring.datasource.url: ${{secret.DATABASE_URL}}
-        spring.datasource.username: ${{secret.DATA_USERNAME}}
-        spring.datasource.password: ${{secret.DATA_PASSWORD}}
-        jwt.secret: ${{secret.JWT_SECRET}}
-        cloud.aws.credentials.accessKey: ${{secret.AWS_ACCESS}}
-        cloud.aws.credentials.secretKey: ${{secret.AWS_SECRET}}
+        spring.datasource.url: ${{secrets.DATABASE_URL}}
+        spring.datasource.username: ${{secrets.DATA_USERNAME}}
+        spring.datasource.password: ${{secrets.DATA_PASSWORD}}
+        jwt.secret: ${{secrets.JWT_SECRET}}
+        cloud.aws.credentials.accessKey: ${{secrets.AWS_ACCESS}}
+        cloud.aws.credentials.secretKey: ${{secrets.AWS_SECRET}}
         cloud.aws.s3.bucket:  ${{ env.S3_BUCKET_NAME }}
         cloud.aws.region.static:  ${{ env.AWS_REGION }}
-        spring.mail.username: ${{secret.MAIL_USERNAME}}
-        spring.mail.password: ${{secret.MAIL_PASSWORD}}
-        spring.security.oauth2.client.registration.kakao.client-id: ${{secret.KAKAO_ID}}
-        spring.security.oauth2.client.registration.kakao.redirect-uri: ${{secret.REDIRECT_URI}}
-        spring.security.oauth2.client.registration.kakao.client-secret: ${{secret.CLIEN_SECRET}}
-        spring.security.oauth2.client.registration.kakao.authorization-grant-type: ${{secret.AUTHORIZATION_GRANT_TYPE}}
-        spring.security.oauth2.client.registration.kakao.scope: ${{secret.KAKAO_SCOPE}}
-        spring.security.oauth2.client.registration.kakao.client-name: ${{secret.KAKAO_CLIENT_NAME}}
-        spring.security.oauth2.client.provider.kakao.authorization-uri: ${{secret.AUTHORIZATION_URI}}
-        spring.security.oauth2.client.provider.kakao.token-uri: ${{secret.TOKEN_URI}}
-        spring.security.oauth2.client.provider.kakao.user-info-uri: ${{secret.USER_INFO_URI}}
-        spring.security.oauth2.client.provider.kakao.user-name-attribute: ${{secret.USER_NAME_ATTRIBUTE}}
+        spring.mail.username: ${{secrets.MAIL_USERNAME}}
+        spring.mail.password: ${{secrets.MAIL_PASSWORD}}
+        spring.security.oauth2.client.registration.kakao.client-id: ${{secrets.KAKAO_ID}}
+        spring.security.oauth2.client.registration.kakao.redirect-uri: ${{secrets.REDIRECT_URI}}
+        spring.security.oauth2.client.registration.kakao.client-secret: ${{secrets.CLIEN_SECRET}}
+        spring.security.oauth2.client.registration.kakao.authorization-grant-type: ${{secrets.AUTHORIZATION_GRANT_TYPE}}
+        spring.security.oauth2.client.registration.kakao.scope: ${{secrets.KAKAO_SCOPE}}
+        spring.security.oauth2.client.registration.kakao.client-name: ${{secrets.KAKAO_CLIENT_NAME}}
+        spring.security.oauth2.client.provider.kakao.authorization-uri: ${{secrets.AUTHORIZATION_URI}}
+        spring.security.oauth2.client.provider.kakao.token-uri: ${{secrets.TOKEN_URI}}
+        spring.security.oauth2.client.provider.kakao.user-info-uri: ${{secrets.USER_INFO_URI}}
+        spring.security.oauth2.client.provider.kakao.user-name-attribute: ${{secrets.USER_NAME_ATTRIBUTE}}
         
       
     # 권한 재설정
