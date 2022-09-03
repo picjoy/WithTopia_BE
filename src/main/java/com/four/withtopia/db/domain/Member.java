@@ -1,5 +1,6 @@
 package com.four.withtopia.db.domain;
 
+import com.four.withtopia.dto.request.MemberRequestDto;
 import com.four.withtopia.util.Timestamped;
 import lombok.*;
 import org.hibernate.Hibernate;
