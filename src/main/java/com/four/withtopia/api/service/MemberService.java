@@ -5,7 +5,6 @@ import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.*;
-import com.four.withtopia.dto.KakaoUserInfoDto;
 import com.four.withtopia.dto.request.LoginRequestDto;
 import com.four.withtopia.dto.request.MemberRequestDto;
 import com.four.withtopia.dto.request.TokenDto;
