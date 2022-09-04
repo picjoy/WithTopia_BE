@@ -47,10 +47,13 @@ public class MypageService {
 //            return ResponseDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
         }
 
-        Member updateMember = member.updateMember(requestDto);
-        memberRepository.save(updateMember);
-
-        MypageResponseDto responseDto = MypageResponseDto.createMypageResponseDto(updateMember);
+        member.updateMember(requestDto);
+        memberRepository.save(member);
+        MypageResponseDto responseDto = MypageResponseDto.createMypageResponseDto(member);
+        System.out.println("responseDto id = " + responseDto.getId());
+        System.out.println("responseDto email = " + responseDto.getEmail());
+        System.out.println("responseDto nickname = " + responseDto.getNickname());
+        System.out.println("responseDto profile image = " + responseDto.getProfileImage());
 
         return ResponseEntity.ok(responseDto);
     }
@@ -67,8 +70,8 @@ public class MypageService {
 //            return ResponseDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
         }
 
-        Member deleteMember = member.deleteMember();
-        memberRepository.save(deleteMember);
+        member.deleteMember();
+        memberRepository.save(member);
 
         return ResponseEntity.ok("success");
     }
