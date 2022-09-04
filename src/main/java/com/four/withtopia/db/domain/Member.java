@@ -1,5 +1,7 @@
 package com.four.withtopia.db.domain;
 
+import com.four.withtopia.dto.request.MemberRequestDto;
+import com.four.withtopia.dto.request.ProfileUpdateRequestDto;
 import com.four.withtopia.util.Timestamped;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -79,5 +81,19 @@ public class Member extends Timestamped {
 //
     public boolean validatePassword(PasswordEncoder passwordEncoder, String password) {
         return passwordEncoder.matches(password, this.password);
+    }
+
+    // 멤버 프로필 업데이트
+    public Member updateMember(ProfileUpdateRequestDto requestDto){
+        return Member.builder()
+                .nickName(requestDto.getNickname())
+                .profileImage(requestDto.getProfileImage())
+                .build();
+    }
+
+    public Member deleteMember(){
+        return Member.builder()
+                .isDelete(true)
+                .build();
     }
 }

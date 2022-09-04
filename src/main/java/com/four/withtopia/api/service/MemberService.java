@@ -5,7 +5,6 @@ import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.*;
-import com.four.withtopia.dto.KakaoUserInfoDto;
 import com.four.withtopia.dto.request.LoginRequestDto;
 import com.four.withtopia.dto.request.TokenDto;
 import com.four.withtopia.dto.response.MemberResponseDto;
@@ -25,12 +24,10 @@ import java.util.Optional;
 public class MemberService {
 
   private final MemberRepository memberRepository;
-
   private final PasswordEncoder passwordEncoder;
 //  private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final TokenProvider tokenProvider;
   private final KakaoService kakaoService;
-
   private final GoogleService googleService;
 
   @Transactional
