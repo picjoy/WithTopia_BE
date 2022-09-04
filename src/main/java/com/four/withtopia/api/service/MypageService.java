@@ -50,10 +50,6 @@ public class MypageService {
         member.updateMember(requestDto);
         memberRepository.save(member);
         MypageResponseDto responseDto = MypageResponseDto.createMypageResponseDto(member);
-        System.out.println("responseDto id = " + responseDto.getId());
-        System.out.println("responseDto email = " + responseDto.getEmail());
-        System.out.println("responseDto nickname = " + responseDto.getNickname());
-        System.out.println("responseDto profile image = " + responseDto.getProfileImage());
 
         return ResponseEntity.ok(responseDto);
     }
