@@ -92,4 +92,5 @@ public class Member extends Timestamped {
     public void deleteMember(){
         this.isDelete = true;
     }
+
 }
