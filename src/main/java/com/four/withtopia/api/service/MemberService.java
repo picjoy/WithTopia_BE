@@ -5,9 +5,6 @@ import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.*;
-import com.four.withtopia.dto.request.LoginRequestDto;
-import com.four.withtopia.dto.request.MemberRequestDto;
-import com.four.withtopia.dto.request.TokenDto;
 import com.four.withtopia.dto.response.MemberResponseDto;
 import com.four.withtopia.dto.response.ResponseDto;
 import com.four.withtopia.util.ValidationUtil;
@@ -31,6 +28,7 @@ public class MemberService {
   private final TokenProvider tokenProvider;
   private final KakaoService kakaoService;
   private final GoogleService googleService;
+
   private final ValidationUtil validationUtil;
 
   @Transactional

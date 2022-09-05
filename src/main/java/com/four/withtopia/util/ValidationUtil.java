@@ -5,10 +5,12 @@ import com.four.withtopia.db.repository.EmailAuthRepository;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.MemberRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @RequiredArgsConstructor
+@Component
 public class ValidationUtil {
 
     private final MemberRepository memberRepository;
