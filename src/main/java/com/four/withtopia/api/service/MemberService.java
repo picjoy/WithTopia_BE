@@ -5,11 +5,9 @@ import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.*;
-import com.four.withtopia.dto.request.LoginRequestDto;
-import com.four.withtopia.dto.request.MemberRequestDto;
-import com.four.withtopia.dto.request.TokenDto;
 import com.four.withtopia.dto.response.MemberResponseDto;
 import com.four.withtopia.dto.response.ResponseDto;
+import com.four.withtopia.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,13 +23,13 @@ import java.util.Optional;
 public class MemberService {
 
   private final MemberRepository memberRepository;
-
   private final PasswordEncoder passwordEncoder;
 //  private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final TokenProvider tokenProvider;
   private final KakaoService kakaoService;
-
   private final GoogleService googleService;
+
+  private final ValidationUtil validationUtil;
 
   @Transactional
   public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
@@ -148,9 +146,19 @@ public class MemberService {
   }
 
   public ResponseEntity<?> createMember(MemberRequestDto requestDto) {
-    if (requestDto.getAuthKey() == null) {
-      ResponseEntity.ok("이메일 인증번호를 적어주세요!");
+    if (validationUtil.emailExist(requestDto.getEmail())){
+      return ResponseEntity.ok("이미 회원가입된 이메일 입니다.");
     }
+    if (requestDto.getAuthKey() == null) {
+      return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
+    }
+    if (validationUtil.emailAuth(requestDto)){
+      return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
+    }
+    if (!(validationUtil.passwordCheck(requestDto))){
+      return ResponseEntity.ok("비밀번호가 다릅니다.");
+    }
+
     Member member = new Member(requestDto);
     memberRepository.save(member);
     return ResponseEntity.ok("success");
