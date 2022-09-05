@@ -85,11 +85,12 @@ public class Member extends Timestamped {
 
     // 멤버 프로필 업데이트
     public void updateMember(ProfileUpdateRequestDto requestDto){
-        this.nickName = requestDto.getNickName();
+        this.nickName = requestDto.getNickname();
         this.profileImage = requestDto.getProfileImage();
     }
 
     public void deleteMember(){
         this.isDelete = true;
     }
+
 }
