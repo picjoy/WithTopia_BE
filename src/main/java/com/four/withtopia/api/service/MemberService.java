@@ -7,6 +7,7 @@ import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.*;
 import com.four.withtopia.dto.response.MemberResponseDto;
 import com.four.withtopia.dto.response.ResponseDto;
+import com.four.withtopia.util.MemberCheckUtils;
 import com.four.withtopia.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,8 @@ public class MemberService {
 
   private final ValidationUtil validationUtil;
 
+  private final MemberCheckUtils memberCheckUtils;
+
   @Transactional
   public ResponseEntity<?> login(LoginRequestDto requestDto, HttpSession session) {
     Member member = isPresentMember(requestDto.getEmail());
@@ -42,7 +45,7 @@ public class MemberService {
       return ResponseEntity.ok("INVALID_MEMBER 사용자를 찾을 수 없습니다.");
     }
 
-    session.setAttribute("Authorization","Bearer "+tokenProvider.GenerateAccessToken(member));
+    session.setAttribute("Authorization","Bearer " + tokenProvider.GenerateAccessToken(member));
     session.setAttribute("RefreshToken",tokenProvider.GenerateRefreshToken(member));
 
     return ResponseEntity.ok(
@@ -56,22 +59,21 @@ public class MemberService {
   }
 
 
-  public ResponseDto<?> logout(HttpServletRequest request) {
-    if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
-      return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+  public ResponseEntity<?> logout(HttpServletRequest request) {
+    // 멤버 검증
+    ResponseEntity<?> memberCheck = memberCheckUtils.checkMember(request);
+    if(memberCheck != null){
+      return memberCheck;
     }
-    Member member = tokenProvider.getMemberFromAuthentication();
-    if (null == member) {
-      return ResponseDto.fail("MEMBER_NOT_FOUND",
-          "사용자를 찾을 수 없습니다.");
-    }
+    Member member = memberCheckUtils.member();
 
+    request.getSession().invalidate();
     return tokenProvider.deleteRefreshToken(member);
   }
 
   
 //  카카오 로그인
-  public ResponseEntity<?> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+  public ResponseEntity<?> kakaoLogin(String code, HttpSession session) throws JsonProcessingException {
     // 인가코드 받아서 카카오 엑세스 토큰 받기
     String kakaoAccessToken = kakaoService.getKakaoAccessToken(code);
     // 카카오 엑세스 토큰으로 유저 정보 받아오기
@@ -79,7 +81,7 @@ public class MemberService {
     // 회원가입 필요 시 회원 가입
     Member createMember = kakaoService.createKakaoMember(kakaoUserInfo);
     // 로그인 - 토큰 헤더에 넣어주기
-    socialLogin(createMember, response);
+    socialLogin(createMember, session);
     // MemberResponseDto
     MemberResponseDto responseDto = MemberResponseDto.createSocialMemberResponseDto(createMember);
 
@@ -87,7 +89,7 @@ public class MemberService {
   }
 
 //  구글 로그인
-  public ResponseEntity<?> googleLogin(String code, HttpServletResponse response) throws JsonProcessingException {
+  public ResponseEntity<?> googleLogin(String code, HttpSession session) throws JsonProcessingException {
     // 인가코드 받아서 구글 엑세스 토큰 받기
     String googleAccessToken = googleService.getGoogleAccessToken(code);
     // 구글 엑세스 토큰으로 유저 정보 받아오기
@@ -95,7 +97,7 @@ public class MemberService {
     // 회원가입 필요시 회원가입
     Member createMember = googleService.createGoogleMember(googleUserInfo);
     // 로그인 - 토큰 헤더에 넣어주기
-    socialLogin(createMember, response);
+    socialLogin(createMember, session);
     // MemberResponseDto
     MemberResponseDto responseDto = MemberResponseDto.createSocialMemberResponseDto(createMember);
 
@@ -108,16 +110,16 @@ public class MemberService {
     return optionalMember.orElse(null);
   }
 
-  public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
-    response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
-    response.addHeader("Refresh-Token", tokenDto.getRefreshToken());
-    response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
+  public void tokenToSessions(String access, String refresh, HttpSession session) {
+    session.setAttribute("Authorization", "Bearer " + access);
+    session.setAttribute("RefreshToken", refresh);
   }
 
   // 소셜 로그인 - 토큰 만들어서 헤더에 넣어주기
-  public void socialLogin(Member socialUser, HttpServletResponse response){
-    TokenDto tokenDto = tokenProvider.generateTokenDto(socialUser);
-    tokenToHeaders(tokenDto, response);
+  public void socialLogin(Member socialUser, HttpSession session){
+    String accessToken = tokenProvider.GenerateAccessToken(socialUser);
+    String refreshToken = tokenProvider.GenerateRefreshToken(socialUser);
+    tokenToSessions(accessToken, refreshToken, session);
   }
 
   public ResponseEntity<?> createMember(MemberRequestDto requestDto) {

@@ -6,18 +6,17 @@ import com.four.withtopia.api.service.MemberService;
 import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.dto.request.LoginRequestDto;
 import com.four.withtopia.dto.request.MemberRequestDto;
-import com.four.withtopia.dto.response.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping(produces = "application/json; charset=utf8")
 public class MemberController {
 
   private final MemberService memberService;
@@ -34,18 +33,18 @@ public class MemberController {
   }
 
   @RequestMapping(value = "/member/logout", method = RequestMethod.POST)
-  public ResponseDto<?> logout(HttpServletRequest request) {
+  public ResponseEntity<?> logout(HttpServletRequest request) {
     return memberService.logout(request);
   }
 
   @RequestMapping(value = "/member/login/kakao", method = RequestMethod.GET)
-  public ResponseEntity<?> kakaoLogin(@RequestParam(value="code") String code, HttpServletResponse response) throws JsonProcessingException {
-    return memberService.kakaoLogin(code, response);
+  public ResponseEntity<?> kakaoLogin(@RequestParam(value="code") String code, HttpSession session) throws JsonProcessingException {
+    return memberService.kakaoLogin(code, session);
   }
 
   @RequestMapping(value = "/member/login/google", method = RequestMethod.GET)
-  public ResponseEntity<?> googleLogin(@RequestParam(value="code") String code, HttpServletResponse response) throws JsonProcessingException {
-    return memberService.googleLogin(code, response);
+  public ResponseEntity<?> googleLogin(@RequestParam(value="code") String code, HttpSession session) throws JsonProcessingException {
+    return memberService.googleLogin(code, session);
   }
 
   @RequestMapping(value = "/member/test", method = RequestMethod.GET)

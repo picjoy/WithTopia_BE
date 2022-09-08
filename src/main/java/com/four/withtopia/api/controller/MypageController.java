@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(produces = "application/json; charset=utf8")
 public class MypageController {
     private final MypageService mypageService;
 

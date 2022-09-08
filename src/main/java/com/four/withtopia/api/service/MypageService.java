@@ -7,6 +7,7 @@ import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.ProfileUpdateRequestDto;
 import com.four.withtopia.dto.response.MypageResponseDto;
 import com.four.withtopia.dto.response.ResponseDto;
+import com.four.withtopia.util.MemberCheckUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,33 +20,28 @@ import javax.servlet.http.HttpServletRequest;
 public class MypageService {
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
+    private final MemberCheckUtils memberCheckUtils;
 
     @Transactional(readOnly = true)
     public ResponseEntity<?> getMypage( HttpServletRequest request){
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
-            return ResponseEntity.badRequest().body("Token이 유효하지 않습니다.");
-//                    "INVALID_TOKEN", "Token이 유효하지 않습니다.");
+        // 토큰 검사
+        ResponseEntity<?> memberCheck = memberCheckUtils.checkMember(request);
+        if(memberCheck != null){
+            return memberCheck;
         }
-        Member member = tokenProvider.getMemberFromAuthentication();
-        if (null == member) {
-            return ResponseEntity.badRequest().body("사용자를 찾을 수 없습니다.");
-//            return ResponseDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
-        }
+
+        Member member = memberCheckUtils.member();
         MypageResponseDto responseDto = MypageResponseDto.createMypageResponseDto(member);
         return ResponseEntity.ok(responseDto);
     }
 
     @Transactional
     public ResponseEntity<?> updateMemberInfo(ProfileUpdateRequestDto requestDto, HttpServletRequest request){
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
-            return ResponseEntity.badRequest().body("Token이 유효하지 않습니다.");
-//                    "INVALID_TOKEN", "Token이 유효하지 않습니다.");
+        ResponseEntity<?> memberCheck = memberCheckUtils.checkMember(request);
+        if(memberCheck != null){
+            return memberCheck;
         }
-        Member member = tokenProvider.getMemberFromAuthentication();
-        if (null == member) {
-            return ResponseEntity.badRequest().body("사용자를 찾을 수 없습니다.");
-//            return ResponseDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
-        }
+        Member member = memberCheckUtils.member();
 
         member.updateMember(requestDto);
         memberRepository.save(member);
@@ -56,15 +52,8 @@ public class MypageService {
 
     @Transactional
     public ResponseEntity<?> deleteMember(HttpServletRequest request){
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
-            return ResponseEntity.badRequest().body("Token이 유효하지 않습니다.");
-//                    "INVALID_TOKEN", "Token이 유효하지 않습니다.");
-        }
-        Member member = tokenProvider.getMemberFromAuthentication();
-        if (null == member) {
-            return ResponseEntity.badRequest().body("사용자를 찾을 수 없습니다.");
-//            return ResponseDto.fail("MEMBER_NOT_FOUND", "사용자를 찾을 수 없습니다.");
-        }
+        ResponseEntity<?> memberCheck = memberCheckUtils.checkMember(request);
+        Member member = memberCheckUtils.member();
 
         member.deleteMember();
         memberRepository.save(member);

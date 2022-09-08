@@ -14,6 +14,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,49 +38,15 @@ public class TokenProvider {
 
     private final Key key;
 
-    private final MemberRepository memberRepository;
-
     private final RefreshTokenRepository refreshTokenRepository;
+
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
-                         MemberRepository memberRepository, RefreshTokenRepository refreshTokenRepository) {
-        this.memberRepository = memberRepository;
+                         RefreshTokenRepository refreshTokenRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenDto generateTokenDto(Member member) {
-        long now = (new Date().getTime());
-
-        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-        String accessToken = Jwts.builder()
-                .setSubject(member.getEmail())
-                .claim(AUTHORITIES_KEY, Authority.ROLE_MEMBER.toString())
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + REFRESH_TOKEN_EXPRIRE_TIME))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        RefreshToken refreshTokenObject = RefreshToken.builder()
-                .id(member.getMemberId())
-                .member(member)
-                .value(refreshToken)
-                .build();
-
-        refreshTokenRepository.save(refreshTokenObject);
-
-        return TokenDto.builder()
-                .grantType(BEARER_PREFIX)
-                .accessToken(accessToken)
-                .accessTokenExpiresIn(accessTokenExpiresIn.getTime())
-                .refreshToken(refreshToken)
-                .build();
-
-    }
     // -------------------------------------------------------엑세스 토큰 발급
     public String GenerateAccessToken(Member member){
         long now = (new Date().getTime());
@@ -156,14 +123,14 @@ public class TokenProvider {
     }
 
     @Transactional
-    public ResponseDto<?> deleteRefreshToken(Member member) {
+    public ResponseEntity<?> deleteRefreshToken(Member member) {
         RefreshToken refreshToken = isPresentRefreshToken(member);
         if (null == refreshToken) {
-            return ResponseDto.fail("TOKEN_NOT_FOUND", "존재하지 않는 Token 입니다.");
+            return ResponseEntity.ok("TOKEN_NOT_FOUND, 존재하지 않는 Token 입니다.");
         }
 
         refreshTokenRepository.delete(refreshToken);
-        return ResponseDto.success("success");
+        return ResponseEntity.ok("success");
     }
     // -------------------------------------------------------Reissue
 
