@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Builder
 @Getter
 @NoArgsConstructor
@@ -15,15 +13,15 @@ import java.time.LocalDateTime;
 public class MemberResponseDto {
   private Long id;
   private String nickname;
-  private LocalDateTime createdAt;
-  private LocalDateTime modifiedAt;
+  private String email;
+  private String ProfileImage;
 
   public static MemberResponseDto createMemberResponseDto(Member member){
     return MemberResponseDto.builder()
             .id(member.getMemberId())
             .nickname(member.getNickName())
-            .createdAt(member.getCreatedAt())
-            .modifiedAt(member.getModifiedAt())
+            .email(member.getEmail())
+            .ProfileImage(member.getProfileImage())
             .build();
   }
   public static MemberResponseDto createSocialMemberResponseDto(Member member){
@@ -33,8 +31,8 @@ public class MemberResponseDto {
     return MemberResponseDto.builder()
             .id(member.getMemberId())
             .nickname(nickname[0])
-            .createdAt(member.getCreatedAt())
-            .modifiedAt(member.getModifiedAt())
+            .email(member.getEmail())
+            .ProfileImage(member.getProfileImage())
             .build();
   }
 }

@@ -5,6 +5,7 @@ import com.four.withtopia.config.security.Authority;
 import com.four.withtopia.config.security.UserDetailsImpl;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.RefreshToken;
+import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.RefreshTokenRepository;
 import com.four.withtopia.dto.request.TokenDto;
 import com.four.withtopia.dto.response.ResponseDto;
@@ -36,9 +37,12 @@ public class TokenProvider {
 
     private final Key key;
 
+    private final MemberRepository memberRepository;
+
     private final RefreshTokenRepository refreshTokenRepository;
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
-                         RefreshTokenRepository refreshTokenRepository) {
+                         MemberRepository memberRepository, RefreshTokenRepository refreshTokenRepository) {
+        this.memberRepository = memberRepository;
         this.refreshTokenRepository = refreshTokenRepository;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
@@ -76,8 +80,37 @@ public class TokenProvider {
                 .build();
 
     }
+    // -------------------------------------------------------엑세스 토큰 발급
+    public String GenerateAccessToken(Member member){
+        long now = (new Date().getTime());
+        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
 
+        return Jwts.builder()
+                .setSubject(member.getEmail())
+                .claim(AUTHORITIES_KEY, Authority.ROLE_MEMBER.toString())
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+    // -------------------------------------------------------리프레쉬 토큰 발급
+    public String GenerateRefreshToken(Member member){
+        long now = (new Date().getTime());
 
+        String refreshToken = Jwts.builder()
+                .setExpiration(new Date(now + REFRESH_TOKEN_EXPRIRE_TIME))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        RefreshToken refreshTokenObject = RefreshToken.builder()
+                .id(member.getMemberId())
+                .member(member)
+                .value(refreshToken)
+                .build();
+
+        refreshTokenRepository.save(refreshTokenObject);
+        return refreshToken;
+    }
+    // -------------------------------------------------------인증 정보로 부터 유저 정보를 가져옴
     public Member getMemberFromAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || AnonymousAuthenticationToken.class.
@@ -86,7 +119,20 @@ public class TokenProvider {
         }
         return ((UserDetailsImpl) authentication.getPrincipal()).getMember();
     }
+    // ------------------------------------------------------- 유저 email 정보로 토큰 발급
 
+    public String ReissueAccessToken(String Refresh){
+        long now = (new Date().getTime());
+        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(Refresh).getBody();
+        Member member = refreshTokenRepository.findByValue(claims.getSubject()).getMember();
+        return Jwts.builder()
+                .setSubject(member.getEmail())
+                .claim(AUTHORITIES_KEY, Authority.ROLE_MEMBER.toString())
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -119,4 +165,6 @@ public class TokenProvider {
         refreshTokenRepository.delete(refreshToken);
         return ResponseDto.success("success");
     }
+    // -------------------------------------------------------Reissue
+
 }
