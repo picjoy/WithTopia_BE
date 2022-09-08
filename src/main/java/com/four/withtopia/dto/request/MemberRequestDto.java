@@ -16,6 +16,7 @@ public class MemberRequestDto {
   private String password;
 
   private String passwordConfirm;
+
   private String authKey;
 
 

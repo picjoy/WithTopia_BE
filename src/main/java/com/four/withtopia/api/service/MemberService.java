@@ -5,11 +5,9 @@ import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.*;
-import com.four.withtopia.dto.request.LoginRequestDto;
-import com.four.withtopia.dto.request.MemberRequestDto;
-import com.four.withtopia.dto.request.TokenDto;
 import com.four.withtopia.dto.response.MemberResponseDto;
 import com.four.withtopia.dto.response.ResponseDto;
+import com.four.withtopia.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -25,66 +24,37 @@ import java.util.Optional;
 public class MemberService {
 
   private final MemberRepository memberRepository;
-
   private final PasswordEncoder passwordEncoder;
-//  private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final TokenProvider tokenProvider;
   private final KakaoService kakaoService;
-
   private final GoogleService googleService;
 
+  private final ValidationUtil validationUtil;
+
   @Transactional
-  public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
-    Member member = isPresentMember(requestDto.getNickname());
+  public ResponseEntity<?> login(LoginRequestDto requestDto, HttpSession session) {
+    Member member = isPresentMember(requestDto.getEmail());
     if (null == member) {
-      return ResponseDto.fail("MEMBER_NOT_FOUND",
-          "사용자를 찾을 수 없습니다.");
+      return ResponseEntity.ok("MEMBER_NOT_FOUND 사용자를 찾을 수 없습니다.");
     }
 
     if (!member.validatePassword(passwordEncoder, requestDto.getPassword())) {
-      return ResponseDto.fail("INVALID_MEMBER", "사용자를 찾을 수 없습니다.");
+      return ResponseEntity.ok("INVALID_MEMBER 사용자를 찾을 수 없습니다.");
     }
 
-//    UsernamePasswordAuthenticationToken authenticationToken =
-//        new UsernamePasswordAuthenticationToken(requestDto.getNickname(), requestDto.getPassword());
-//    Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+    session.setAttribute("Authorization","Bearer "+tokenProvider.GenerateAccessToken(member));
+    session.setAttribute("RefreshToken",tokenProvider.GenerateRefreshToken(member));
 
-    TokenDto tokenDto = tokenProvider.generateTokenDto(member);
-    tokenToHeaders(tokenDto, response);
-
-    return ResponseDto.success(
+    return ResponseEntity.ok(
         MemberResponseDto.builder()
             .id(member.getMemberId())
             .nickname(member.getNickName())
-            .createdAt(member.getCreatedAt())
-            .modifiedAt(member.getModifiedAt())
+            .email(member.getEmail())
+            .ProfileImage(member.getProfileImage())
             .build()
     );
   }
 
-//  @Transactional
-//  public ResponseDto<?> reissue(HttpServletRequest request, HttpServletResponse response) {
-//    if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
-//      return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
-//    }
-//    Member member = tokenProvider.getMemberFromAuthentication();
-//    if (null == member) {
-//      return ResponseDto.fail("MEMBER_NOT_FOUND",
-//          "사용자를 찾을 수 없습니다.");
-//    }
-//
-//    Authentication authentication = tokenProvider.getAuthentication(request.getHeader("Access-Token"));
-//    RefreshToken refreshToken = tokenProvider.isPresentRefreshToken(member);
-//
-//    if (!refreshToken.getValue().equals(request.getHeader("Refresh-Token"))) {
-//      return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
-//    }
-//
-//    TokenDto tokenDto = tokenProvider.generateTokenDto(member);
-//    refreshToken.updateValue(tokenDto.getRefreshToken());
-//    tokenToHeaders(tokenDto, response);
-//    return ResponseDto.success("success");
-//  }
 
   public ResponseDto<?> logout(HttpServletRequest request) {
     if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
@@ -99,6 +69,8 @@ public class MemberService {
     return tokenProvider.deleteRefreshToken(member);
   }
 
+  
+//  카카오 로그인
   public ResponseEntity<?> kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
     // 인가코드 받아서 카카오 엑세스 토큰 받기
     String kakaoAccessToken = kakaoService.getKakaoAccessToken(code);
@@ -114,6 +86,7 @@ public class MemberService {
     return ResponseEntity.ok(responseDto);
   }
 
+//  구글 로그인
   public ResponseEntity<?> googleLogin(String code, HttpServletResponse response) throws JsonProcessingException {
     // 인가코드 받아서 구글 엑세스 토큰 받기
     String googleAccessToken = googleService.getGoogleAccessToken(code);
@@ -130,8 +103,8 @@ public class MemberService {
   }
 
   @Transactional(readOnly = true)
-  public Member isPresentMember(String nickname) {
-    Optional<Member> optionalMember = memberRepository.findByNickName(nickname);
+  public Member isPresentMember(String email) {
+    Optional<Member> optionalMember = memberRepository.findByEmail(email);
     return optionalMember.orElse(null);
   }
 
@@ -148,10 +121,20 @@ public class MemberService {
   }
 
   public ResponseEntity<?> createMember(MemberRequestDto requestDto) {
-    if (requestDto.getAuthKey() == null) {
-      ResponseEntity.ok("이메일 인증번호를 적어주세요!");
+    if (validationUtil.emailExist(requestDto.getEmail())){
+      return ResponseEntity.ok("이미 회원가입된 이메일 입니다.");
     }
-    Member member = new Member(requestDto);
+    if (requestDto.getAuthKey() == null) {
+      return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
+    }
+    if (validationUtil.emailAuth(requestDto)){
+      return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
+    }
+    if (!(validationUtil.passwordCheck(requestDto))){
+      return ResponseEntity.ok("비밀번호가 다릅니다.");
+    }
+
+    Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()));
     memberRepository.save(member);
     return ResponseEntity.ok("success");
   }

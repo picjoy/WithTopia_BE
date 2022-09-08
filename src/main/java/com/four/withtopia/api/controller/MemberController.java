@@ -3,6 +3,7 @@ package com.four.withtopia.api.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.four.withtopia.api.service.MemberService;
+import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.dto.request.LoginRequestDto;
 import com.four.withtopia.dto.request.MemberRequestDto;
 import com.four.withtopia.dto.response.ResponseDto;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @RequiredArgsConstructor
@@ -19,6 +21,7 @@ import javax.validation.Valid;
 public class MemberController {
 
   private final MemberService memberService;
+  private final TokenProvider tokenProvider;
 
   @RequestMapping(value = "/member/signup", method = RequestMethod.POST)
   public ResponseEntity<?> signup(@RequestBody @Valid MemberRequestDto requestDto) {
@@ -26,16 +29,9 @@ public class MemberController {
   }
 
   @RequestMapping(value = "/member/login", method = RequestMethod.POST)
-  public ResponseDto<?> login(@RequestBody @Valid LoginRequestDto requestDto,
-      HttpServletResponse response
-  ) {
-    return memberService.login(requestDto, response);
+  public ResponseEntity<?> login(@RequestBody LoginRequestDto requestDto, HttpSession session) {
+    return ResponseEntity.ok(memberService.login(requestDto,session));
   }
-
-//  @RequestMapping(value = "/api/auth/member/reissue", method = RequestMethod.POST)
-//  public ResponseDto<?> reissue(HttpServletRequest request, HttpServletResponse response) {
-//    return memberService.reissue(request, response);
-//  }
 
   @RequestMapping(value = "/member/logout", method = RequestMethod.POST)
   public ResponseDto<?> logout(HttpServletRequest request) {
@@ -50,5 +46,10 @@ public class MemberController {
   @RequestMapping(value = "/member/login/google", method = RequestMethod.GET)
   public ResponseEntity<?> googleLogin(@RequestParam(value="code") String code, HttpServletResponse response) throws JsonProcessingException {
     return memberService.googleLogin(code, response);
+  }
+
+  @RequestMapping(value = "/member/test", method = RequestMethod.GET)
+  public ResponseEntity<?> test1(HttpServletRequest request){
+    return ResponseEntity.ok(tokenProvider.getMemberFromAuthentication());
   }
 }
