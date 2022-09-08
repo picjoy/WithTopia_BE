@@ -35,6 +35,7 @@ public class Member extends Timestamped {
     private String profileImage;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean isDelete = false;
 
     @Column
@@ -42,10 +43,10 @@ public class Member extends Timestamped {
     @Column
     private String googleId;
 
-    public Member(MemberRequestDto requestDto) {
+    public Member(MemberRequestDto requestDto,String password) {
         this.nickName = requestDto.getNickname();
         this.email = requestDto.getEmail();
-        this.password = requestDto.getPassword();
+        this.password = password;
         this.profileImage = "https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/e3f569cf-b23a-4462-a0e1-9caa51e36aca";
     }
 
