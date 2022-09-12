@@ -27,23 +27,15 @@ public class MypageService {
     @Transactional(readOnly = true)
     public ResponseEntity<?> getMypage( HttpServletRequest request){
         // 토큰 검사
-        ResponseEntity<?> memberCheck = memberCheckUtils.checkMember(request);
-        if(memberCheck != null){
-            return memberCheck;
-        }
-
-        Member member = memberCheckUtils.member();
+        Member member = memberCheckUtils.checkMember(request);
         MypageResponseDto responseDto = MypageResponseDto.createMypageResponseDto(member);
         return ResponseEntity.ok(responseDto);
     }
 
     @Transactional
     public ResponseEntity<?> updateMemberInfo(ProfileUpdateRequestDto requestDto, HttpServletRequest request){
-        ResponseEntity<?> memberCheck = memberCheckUtils.checkMember(request);
-        if(memberCheck != null){
-            return memberCheck;
-        }
-        Member member = memberCheckUtils.member();
+        // 토큰 검사
+        Member member = memberCheckUtils.checkMember(request);
 
         member.updateMember(requestDto);
         memberRepository.save(member);
@@ -54,8 +46,8 @@ public class MypageService {
 
     @Transactional
     public ResponseEntity<?> deleteMember(HttpServletRequest request){
-        ResponseEntity<?> memberCheck = memberCheckUtils.checkMember(request);
-        Member member = memberCheckUtils.member();
+        // 토큰 검사
+        Member member = memberCheckUtils.checkMember(request);
 
         member.deleteMember();
         memberRepository.save(member);
