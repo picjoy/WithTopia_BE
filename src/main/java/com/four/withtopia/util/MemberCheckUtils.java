@@ -3,7 +3,6 @@ package com.four.withtopia.util;
 import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 public class MemberCheckUtils {
 
     private final TokenProvider tokenProvider;
-    private final PasswordEncoder passwordEncoder;
 
     public Member checkMember(HttpServletRequest request){
 
