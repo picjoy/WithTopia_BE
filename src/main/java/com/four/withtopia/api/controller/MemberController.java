@@ -29,7 +29,7 @@ public class MemberController {
 
   @RequestMapping(value = "/member/login", method = RequestMethod.POST)
   public ResponseEntity<?> login(@RequestBody LoginRequestDto requestDto, HttpSession session) {
-    return ResponseEntity.ok(memberService.login(requestDto,session));
+    return memberService.login(requestDto,session);
   }
 
   @RequestMapping(value = "/member/logout", method = RequestMethod.POST)
@@ -45,6 +45,11 @@ public class MemberController {
   @RequestMapping(value = "/member/login/google", method = RequestMethod.GET)
   public ResponseEntity<?> googleLogin(@RequestParam(value="code") String code, HttpSession session) throws JsonProcessingException {
     return memberService.googleLogin(code, session);
+  }
+
+  @RequestMapping(value = "/member/changepw", method = RequestMethod.GET)
+  public ResponseEntity<?> changePw(@RequestBody MemberRequestDto requestDto){
+    return memberService.ChangePw(requestDto);
   }
 
   @RequestMapping(value = "/member/test", method = RequestMethod.GET)
