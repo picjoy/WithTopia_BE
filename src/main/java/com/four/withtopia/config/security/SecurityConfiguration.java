@@ -49,6 +49,9 @@ public class SecurityConfiguration {
                 .accessDeniedHandler(accessDeniedHandlerException)
 
                 .and()
+                .headers().frameOptions().disable()
+
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 

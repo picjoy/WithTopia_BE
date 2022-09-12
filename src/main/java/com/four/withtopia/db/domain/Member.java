@@ -90,6 +90,10 @@ public class Member extends Timestamped {
         this.profileImage = requestDto.getProfileImage();
     }
 
+    public void updatePw(String password){
+        this.password = password;
+    }
+
     public void deleteMember(){
         this.isDelete = true;
     }
