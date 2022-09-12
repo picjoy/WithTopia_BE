@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
-import com.four.withtopia.dto.request.*;
+import com.four.withtopia.dto.request.GoogleUserInfoDto;
+import com.four.withtopia.dto.request.KakaoUserInfoDto;
+import com.four.withtopia.dto.request.LoginRequestDto;
+import com.four.withtopia.dto.request.MemberRequestDto;
 import com.four.withtopia.dto.response.MemberResponseDto;
 import com.four.withtopia.util.MemberCheckUtils;
 import com.four.withtopia.util.ValidationUtil;
@@ -59,12 +62,8 @@ public class MemberService {
   }
 
   public ResponseEntity<?> logout(HttpServletRequest request) {
-    // 멤버 검증
-    ResponseEntity<?> memberCheck = memberCheckUtils.checkMember(request);
-    if(memberCheck != null){
-      return memberCheck;
-    }
-    Member member = memberCheckUtils.member();
+    // 토큰 검사
+    Member member = memberCheckUtils.checkMember(request);
 
     request.getSession().invalidate();
     return tokenProvider.deleteRefreshToken(member);
