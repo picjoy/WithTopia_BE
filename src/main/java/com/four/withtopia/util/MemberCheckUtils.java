@@ -16,27 +16,21 @@ public class MemberCheckUtils {
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
 
-    public Member member(){
-        Member member = tokenProvider.getMemberFromAuthentication();
-
-        return member;
-    }
-
-    public ResponseEntity<?> checkMember(HttpServletRequest request){
-
-        Member member = member();
+    public Member checkMember(HttpServletRequest request){
 
         if(request.getSession().getAttribute("RefreshToken") == null){
-            return ResponseEntity.badRequest().body("로그인을 해주세요.");
+            throw new NullPointerException("로그인을 해주세요.");
         }
 
         if (!tokenProvider.validateToken(request.getSession().getAttribute("RefreshToken").toString())) {
-            return ResponseEntity.badRequest().body("Token이 유효하지 않습니다.");
+            throw new IllegalArgumentException("Token이 유효하지 않습니다.");
         }
 
+        Member member = tokenProvider.getMemberFromAuthentication();
+
         if (null == member) {
-            return ResponseEntity.badRequest().body("사용자를 찾을 수 없습니다.");
+            throw new NullPointerException("사용자를 찾을 수 없습니다.");
         }
-        return null;
+        return member;
     }
 }
