@@ -1,5 +1,6 @@
 package com.four.withtopia.config.error;
 
+import io.swagger.v3.oas.annotations.media.Encoding;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,13 +27,13 @@ public class GlobalExceptionHandler {
     //IllegalArgumentException 예외처리
     @ExceptionHandler({IllegalArgumentException.class})
     public ResponseEntity<?> handleException(IllegalArgumentException ex){
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.badRequest().header("Content-Type","application/json; charset=UTF-8").body(ex.getMessage());
     }
 
-    //NullPointArgumentException 예외처리
+    //NullPointerException 예외처리
     @ExceptionHandler({NullPointerException.class})
     public ResponseEntity<?> handleException(NullPointerException ex){
-        return ResponseEntity.status(404).body(ex.getMessage());
+        return ResponseEntity.status(404).header("Content-Type","application/json; charset=UTF-8").body(ex.getMessage());
     }
 }
 
