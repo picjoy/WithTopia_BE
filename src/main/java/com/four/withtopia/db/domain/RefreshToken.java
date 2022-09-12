@@ -22,7 +22,7 @@ public class RefreshToken {
     @OneToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @Column(name = "val", nullable = false)
+    @Column(nullable = false)
     private String value;
 
     public void updateValue(String token) {
