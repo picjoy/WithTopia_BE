@@ -41,7 +41,9 @@ public class MemberService {
     if (null == member) {
       return ResponseEntity.ok("MEMBER_NOT_FOUND 사용자를 찾을 수 없습니다.");
     }
-
+    if (member.isDelete()){
+      return ResponseEntity.ok("MEMBER_NOT_USE 삭제된 멤버입니다.");
+    }
     if (!member.validatePassword(passwordEncoder, requestDto.getPassword())) {
       return ResponseEntity.ok("INVALID_MEMBER 사용자를 찾을 수 없습니다.");
     }
@@ -59,7 +61,6 @@ public class MemberService {
     );
   }
 
-
   public ResponseEntity<?> logout(HttpServletRequest request) {
     // 토큰 검사
     Member member = memberCheckUtils.checkMember(request);
@@ -68,7 +69,6 @@ public class MemberService {
     return tokenProvider.deleteRefreshToken(member);
   }
 
-  
 //  카카오 로그인
   public ResponseEntity<?> kakaoLogin(String code, HttpSession session) throws JsonProcessingException {
     // 인가코드 받아서 카카오 엑세스 토큰 받기
@@ -134,6 +134,26 @@ public class MemberService {
     }
 
     Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()));
+    memberRepository.save(member);
+    return ResponseEntity.ok("success");
+  }
+
+  public ResponseEntity<?> ChangePw(MemberRequestDto requestDto) {
+    if (!validationUtil.emailExist(requestDto.getEmail())){
+      return ResponseEntity.ok("가입되지않은 EMAIL 입니다.");
+    }
+    if (requestDto.getAuthKey() == null) {
+      return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
+    }
+    if (validationUtil.emailAuth(requestDto)){
+      return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
+    }
+    if (!(validationUtil.passwordCheck(requestDto))){
+      return ResponseEntity.ok("비밀번호가 다릅니다.");
+    }
+
+    Member member = isPresentMember(requestDto.getEmail());
+    member.updatePw(passwordEncoder.encode(requestDto.getPassword()));
     memberRepository.save(member);
     return ResponseEntity.ok("success");
   }

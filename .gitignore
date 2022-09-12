@@ -29,6 +29,7 @@ application.properties
 application-jisung.properties
 application-wonyoung.properties
 application.yml
+openvidu-selfsigned.jks
 
 ### NetBeans ###
 /nbproject/private/
