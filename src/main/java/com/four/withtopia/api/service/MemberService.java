@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
+import com.four.withtopia.db.repository.ProfileImageRepository;
 import com.four.withtopia.dto.request.GoogleUserInfoDto;
 import com.four.withtopia.dto.request.KakaoUserInfoDto;
 import com.four.withtopia.dto.request.LoginRequestDto;
@@ -34,6 +35,7 @@ public class MemberService {
   private final ValidationUtil validationUtil;
 
   private final MemberCheckUtils memberCheckUtils;
+  private final ProfileImageRepository profileImageRepository;
 
   @Transactional
   public ResponseEntity<?> login(LoginRequestDto requestDto, HttpSession session) {
@@ -123,6 +125,9 @@ public class MemberService {
     if (validationUtil.emailExist(requestDto.getEmail())){
       return ResponseEntity.ok("이미 회원가입된 이메일 입니다.");
     }
+    if (validationUtil.nicknameExist(requestDto.getNickname())){
+      return ResponseEntity.ok("이미 회원가입된 닉네임 입니다.");
+    }
     if (requestDto.getAuthKey() == null) {
       return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
     }
@@ -132,8 +137,12 @@ public class MemberService {
     if (!(validationUtil.passwordCheck(requestDto))){
       return ResponseEntity.ok("비밀번호가 다릅니다.");
     }
+//    List<ProfileImage> images = profileImageRepository.findAll();
+//    Long randomInt = (long) new Random().nextInt(images.size()+1)-1;
 
-    Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()));
+//    Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()),profileImageRepository.getReferenceById(randomInt).getProfileIamge());
+      String img = "https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/original.jpeg";
+    Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()),img);
     memberRepository.save(member);
     return ResponseEntity.ok("success");
   }
@@ -157,4 +166,9 @@ public class MemberService {
     memberRepository.save(member);
     return ResponseEntity.ok("success");
   }
+
+  public ResponseEntity<?> existnickname(String nickname) {
+    return ResponseEntity.ok(validationUtil.nicknameExist(nickname));
+  }
+
 }

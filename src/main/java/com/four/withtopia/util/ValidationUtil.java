@@ -22,7 +22,9 @@ public class ValidationUtil {
        return memberRepository.existsByEmail(email);
     }
 
-
+    public boolean nicknameExist(String nickname){
+        return memberRepository.existsByNickName(nickname);
+    }
 
     //    아이디 인증 여부 체크 (회원가입) (True면 인증안됨)
     public boolean emailAuth(MemberRequestDto requestDto){
