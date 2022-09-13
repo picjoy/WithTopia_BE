@@ -12,7 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000","https://d2eyce60w9qn52.cloudfront.net")
                 .allowedHeaders("*")
-                .exposedHeaders("")
+                .exposedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3000);
     }

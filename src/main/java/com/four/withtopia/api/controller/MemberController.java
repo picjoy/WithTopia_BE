@@ -52,6 +52,11 @@ public class MemberController {
     return memberService.ChangePw(requestDto);
   }
 
+  @RequestMapping(value = "/member/nickname", method = RequestMethod.POST)
+  public ResponseEntity<?> existnick(@RequestBody String email){
+    return memberService.existnickname(email);
+  }
+
   @RequestMapping(value = "/member/test", method = RequestMethod.GET)
   public ResponseEntity<?> test1(HttpServletRequest request){
     return ResponseEntity.ok(tokenProvider.getMemberFromAuthentication());

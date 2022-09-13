@@ -5,10 +5,7 @@ import com.four.withtopia.config.security.Authority;
 import com.four.withtopia.config.security.UserDetailsImpl;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.RefreshToken;
-import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.RefreshTokenRepository;
-import com.four.withtopia.dto.request.TokenDto;
-import com.four.withtopia.dto.response.ResponseDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -53,7 +50,7 @@ public class TokenProvider {
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
 
         return Jwts.builder()
-                .setSubject(member.getEmail())
+                .setSubject(member.getNickName())
                 .claim(AUTHORITIES_KEY, Authority.ROLE_MEMBER.toString())
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)

@@ -43,11 +43,11 @@ public class Member extends Timestamped {
     @Column
     private String googleId;
 
-    public Member(MemberRequestDto requestDto,String password) {
+    public Member(MemberRequestDto requestDto,String password,String image) {
         this.nickName = requestDto.getNickname();
         this.email = requestDto.getEmail();
         this.password = password;
-        this.profileImage = "https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/e3f569cf-b23a-4462-a0e1-9caa51e36aca";
+        this.profileImage = image;
     }
 
     @Override
