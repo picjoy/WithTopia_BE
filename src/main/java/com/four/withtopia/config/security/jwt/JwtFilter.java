@@ -34,6 +34,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // 실제 필터링 로직은 doFilterInternal 에 들어감
 
+    public static String AUTHORIZATION_HEADER = "authorization";
+
+    public static String REFRESH_HEADER = "RefreshToken";
 
     public static String BEARER_PREFIX = "Bearer ";
 
@@ -54,13 +57,12 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
 //        Session 의 토큰 값 가져오기
-        String jwt = null;
-        if (request.getSession() != null){
-            jwt = resolveToken(request);
-        }
+        String jwt = resolveToken(request);
+
 
         System.out.println("----------------------토큰값-----------");
         System.out.println(jwt);
+
 
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         //바이트배열을 생성한 다음 키를 생성
@@ -71,7 +73,7 @@ public class JwtFilter extends OncePerRequestFilter {
             if (tokenProvider.validateToken(resolveRefresh(request))) {
 //                access 토큰 리이슈 및 재발급
                 jwt = tokenProvider.ReissueAccessToken(resolveToken(request));
-                request.getSession(false).setAttribute("Authorization",BEARER_PREFIX+jwt);
+                response.addHeader(AUTHORIZATION_HEADER,jwt);
             }
         }
 //     JWT 토큰이 정상적이라면 유저정보를 가져오는 부분
@@ -115,7 +117,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
-        String bearerToken = (String) request.getSession(false).getAttribute("Authorization");
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(7);
         }
@@ -124,11 +126,11 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String resolveRefresh(HttpServletRequest request) {
-        String RefreshToken = (String) request.getSession(false).getAttribute("RefreshToken");
+        String RefreshToken = request.getHeader(REFRESH_HEADER);
         if (StringUtils.hasText(RefreshToken)) {
             return RefreshToken;
         }
-        return "nothing";
+        return null;
     }
 
 }

@@ -1,12 +1,13 @@
-//package com.four.withtopia.config.error;
-//
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.ExceptionHandler;
-//import org.springframework.web.bind.annotation.RestControllerAdvice;
-//
-////Global error controller
-//@RestControllerAdvice
-//public class GlobalExceptionHandler {
+package com.four.withtopia.config.error;
+
+import io.swagger.v3.oas.annotations.media.Encoding;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+//Global error controller
+@RestControllerAdvice
+public class GlobalExceptionHandler {
 //
 //    //커스텀 예외처리
 //    @ExceptionHandler(value = { CustomException.class })
@@ -22,11 +23,17 @@
 //                ex.getErrorCode().getHttpStatus()
 //        );
 //    }
-//
-////    //IllegalArgumentException 예외처리
-////    @ExceptionHandler({IllegalArgumentException.class})
-////    public ResponseDto<?> handleException(IllegalArgumentException ex){
-////        return ResponseDto.fail("BAD_REQUEST",ex.getMessage());
-////    }
-//}
-//
+
+    //IllegalArgumentException 예외처리
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<?> handleException(IllegalArgumentException ex){
+        return ResponseEntity.badRequest().header("Content-Type","application/json; charset=UTF-8").body(ex.getMessage());
+    }
+
+    //NullPointerException 예외처리
+    @ExceptionHandler({NullPointerException.class})
+    public ResponseEntity<?> handleException(NullPointerException ex){
+        return ResponseEntity.status(404).header("Content-Type","application/json; charset=UTF-8").body(ex.getMessage());
+    }
+}
+

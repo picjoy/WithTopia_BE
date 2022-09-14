@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping(produces = "application/json; charset=utf8")
 public class EmailController {
 
     private final MailSendService mss;

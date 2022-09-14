@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -28,8 +29,8 @@ public class MemberController {
   }
 
   @RequestMapping(value = "/member/login", method = RequestMethod.POST)
-  public ResponseEntity<?> login(@RequestBody LoginRequestDto requestDto, HttpSession session) {
-    return ResponseEntity.ok(memberService.login(requestDto,session));
+  public ResponseEntity<?> login(@RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
+    return memberService.login(requestDto,response);
   }
 
   @RequestMapping(value = "/member/logout", method = RequestMethod.POST)
@@ -45,6 +46,16 @@ public class MemberController {
   @RequestMapping(value = "/member/login/google", method = RequestMethod.GET)
   public ResponseEntity<?> googleLogin(@RequestParam(value="code") String code, HttpSession session) throws JsonProcessingException {
     return memberService.googleLogin(code, session);
+  }
+
+  @RequestMapping(value = "/member/changepw", method = RequestMethod.GET)
+  public ResponseEntity<?> changePw(@RequestBody MemberRequestDto requestDto){
+    return memberService.ChangePw(requestDto);
+  }
+
+  @RequestMapping(value = "/member/nickname", method = RequestMethod.POST)
+  public ResponseEntity<?> existnick(@RequestBody String email){
+    return memberService.existnickname(email);
   }
 
   @RequestMapping(value = "/member/test", method = RequestMethod.GET)
