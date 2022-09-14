@@ -47,27 +47,24 @@ public enum ErrorCode {
 
     POST_TAG_DUPLICATION_ERROR(HttpStatus.BAD_REQUEST,"118","중복된 태그"),
 
-    POST_MEMEBER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND,"119","조회된 멤버가 없습니다");
+    POST_MEMEBER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND,"119","조회된 멤버가 없습니다"),
 
+    OK(HttpStatus.OK, "0", "정상"),
 
-
-
-
-
-
-
-
-
-
+    // 채팅방
+    NOT_FOUND_ROOM(HttpStatus.BAD_REQUEST, "602", "채팅방을 찾을 수 없습니다."),
+    MEMBER_NOT_AUTH_ERROR_ROOM(HttpStatus.BAD_REQUEST,"117","해당 방에 대한 삭제 권한이 없습니다."),
+    ACCOUNT_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND,"116","로그인을 해주세요!"),
+    ROOM_IS_FULL(HttpStatus.BAD_REQUEST, "409", "방에 인원이 가득 찼습니다.");
 
 
     private final HttpStatus httpStatus;
     private final String errorCode;
-    private final String erroemessage;
+    private final String errormessage;
 
-    ErrorCode(HttpStatus httpStatus, String errorCode, String erroemessage) {
+    ErrorCode(HttpStatus httpStatus, String errorCode, String errormessage) {
         this.httpStatus = httpStatus;
         this.errorCode = errorCode;
-        this.erroemessage = erroemessage;
+        this.errormessage = errormessage;
     }
 }
