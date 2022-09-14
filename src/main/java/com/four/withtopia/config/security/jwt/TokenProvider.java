@@ -66,8 +66,7 @@ public class TokenProvider {
                 .compact();
 
         RefreshToken refreshTokenObject = RefreshToken.builder()
-                .id(member.getMemberId())
-                .member(member)
+                .nickname(member.getNickName())
                 .value(refreshToken)
                 .build();
 
@@ -89,13 +88,17 @@ public class TokenProvider {
         long now = (new Date().getTime());
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(Refresh).getBody();
-        Member member = refreshTokenRepository.findByValue(claims.getSubject()).getMember();
-        return Jwts.builder()
-                .setSubject(member.getEmail())
+        RefreshToken Token = refreshTokenRepository.findByValue(claims.getSubject());
+        String JWT = Jwts.builder()
+                .setSubject(Token.getNickname())
                 .claim(AUTHORITIES_KEY, Authority.ROLE_MEMBER.toString())
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
+        Token.updateValue(JWT);
+        refreshTokenRepository.save(Token);
+        return JWT;
     }
     public boolean validateToken(String token) {
         try {
@@ -115,7 +118,7 @@ public class TokenProvider {
 
     @Transactional(readOnly = true)
     public RefreshToken isPresentRefreshToken(Member member) {
-        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByMember(member);
+        Optional<RefreshToken> optionalRefreshToken = refreshTokenRepository.findByNickname(member.getNickName());
         return optionalRefreshToken.orElse(null);
     }
 

@@ -15,11 +15,11 @@ public class MemberCheckUtils {
 
     public Member checkMember(HttpServletRequest request){
 
-        if(request.getSession().getAttribute("RefreshToken") == null){
+        if(request.getHeader("RefreshToken") == null){
             throw new NullPointerException("로그인을 해주세요.");
         }
 
-        if (!tokenProvider.validateToken(request.getSession().getAttribute("RefreshToken").toString())) {
+        if (!tokenProvider.validateToken(request.getHeader("RefreshToken"))) {
             throw new IllegalArgumentException("Token이 유효하지 않습니다.");
         }
 
