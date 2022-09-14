@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Optional;
 
@@ -38,7 +39,7 @@ public class MemberService {
   private final ProfileImageRepository profileImageRepository;
 
   @Transactional
-  public ResponseEntity<?> login(LoginRequestDto requestDto, HttpSession session) {
+  public ResponseEntity<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
     Member member = isPresentMember(requestDto.getEmail());
     if (null == member) {
       return ResponseEntity.ok("MEMBER_NOT_FOUND 사용자를 찾을 수 없습니다.");
@@ -50,8 +51,8 @@ public class MemberService {
       return ResponseEntity.ok("INVALID_MEMBER 사용자를 찾을 수 없습니다.");
     }
 
-    session.setAttribute("Authorization","Bearer " + tokenProvider.GenerateAccessToken(member));
-    session.setAttribute("RefreshToken",tokenProvider.GenerateRefreshToken(member));
+    response.setHeader("Authorization","Bearer " + tokenProvider.GenerateAccessToken(member));
+    response.setHeader("RefreshToken",tokenProvider.GenerateRefreshToken(member));
 
     return ResponseEntity.ok(
         MemberResponseDto.builder()
@@ -67,10 +68,8 @@ public class MemberService {
     // 토큰 검사
     Member member = memberCheckUtils.checkMember(request);
 
-    request.getSession().invalidate();
     return tokenProvider.deleteRefreshToken(member);
   }
-
 //  카카오 로그인
   public ResponseEntity<?> kakaoLogin(String code, HttpSession session) throws JsonProcessingException {
     // 인가코드 받아서 카카오 엑세스 토큰 받기

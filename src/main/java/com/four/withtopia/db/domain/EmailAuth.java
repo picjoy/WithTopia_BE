@@ -1,25 +1,26 @@
 package com.four.withtopia.db.domain;
 
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
-import javax.persistence.*;
 
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
 @Getter
 @Setter
-@Entity
+@RedisHash(value = "auth",timeToLive = 30)
 public class EmailAuth {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long authId;
+    private String authId;
 
-    @Column
+    @Indexed
     private String email;
 
-    @Column
+    @Indexed
     private String Auth;
 
     public EmailAuth(String email, String authKey) {
