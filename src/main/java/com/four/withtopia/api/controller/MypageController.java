@@ -1,5 +1,7 @@
 package com.four.withtopia.api.controller;
+
 import com.four.withtopia.api.service.MypageService;
+import com.four.withtopia.dto.request.ChangePasswordRequestDto;
 import com.four.withtopia.dto.request.ProfileUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,4 +32,10 @@ public class MypageController {
     public ResponseEntity<?> deleteMember(HttpServletRequest request){
         return mypageService.deleteMember(request);
     }
+
+    @RequestMapping(value = "/member/mypage/changepw", method = RequestMethod.PUT)
+    public ResponseEntity<?> ChangePw(@RequestBody ChangePasswordRequestDto requestDto){
+        return mypageService.changePassword(requestDto);
+    }
+
 }
