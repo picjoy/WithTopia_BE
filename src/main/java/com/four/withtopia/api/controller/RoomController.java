@@ -57,7 +57,7 @@ public class RoomController {
         roomService.outRoom(roomId, member);
         return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, null), HttpStatus.OK);
     }
-/*
+
     // 일반 멤버 나가기
     @PostMapping ("/room/{roomId}/member")
     public ResponseEntity<PrivateResponseBody> outRoomMember(@PathVariable String roomId,@AuthenticationPrincipal UserDetailsImpl userDetails){
@@ -65,7 +65,7 @@ public class RoomController {
         roomService.outRoomMember(roomId,member);
         return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, null), HttpStatus.OK);
     }
-*/
+
     // 방제 수정
     @ApiOperation(value = "방제 수정 메소드")
     @PutMapping("/room/{roomId}")
