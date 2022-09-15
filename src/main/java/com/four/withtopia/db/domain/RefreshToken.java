@@ -13,7 +13,7 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@RedisHash(value = "refresh",timeToLive = 30)
+@RedisHash(value = "refresh",timeToLive = 60 * 60 * 24 * 7)
 public class RefreshToken {
 
     @Id
