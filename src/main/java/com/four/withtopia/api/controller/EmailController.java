@@ -1,6 +1,7 @@
 package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.MailSendService;
+import com.four.withtopia.db.domain.EmailAuth;
 import com.four.withtopia.dto.request.EmailAuthRequestDto;
 import com.four.withtopia.dto.request.EmailRequestDto;
 import lombok.RequiredArgsConstructor;
