@@ -35,8 +35,6 @@ public class RoomService {
 
     // SDK의 진입점인 OpenVidu 개체
     private OpenVidu openVidu;
-    // 세션 이름과 OpenVidu 세션 개체를 페어링하기 위한 컬렉션
-    private Map<String, Session> mapSessions = new ConcurrentHashMap<>();
 
     // OpenVidu 서버가 수신하는 URL
     @Value("${openvidu.url}")
@@ -80,6 +78,7 @@ public class RoomService {
                 .nickname(member.getNickName())
                 .email(member.getEmail())
                 .ProfileImage(member.getProfileImage())
+                .enterRoomToken(savedRoom.getSessionId())
                 .build();
 
         // 채팅방 인원 저장하기
@@ -112,9 +111,8 @@ public class RoomService {
         roomRepository.save(room);
 
         // 저장된 채팅방의 roomId는 OpenVidu 채팅방의 세션 아이디로써 생성 후 바로 해당 채팅방의 세션 아이디와
-        // 오픈 비두 서버에서 미디어 데이터를 받아올 떄 사용할 토큰을 리턴해줍니다.
-        // 채팅방 생성 후 최초 채팅방 생성자는 채팅방에 즉시 입장할 것으로 예상 -> 채팅방이 보여지기 위한 정보들을 리턴해줘야할 것 같습니다.
-        // TODO: 정확한 와이어 프레임을 확인하지 못했으나 프론트에서 화면에 보여지기위한 데이터가 부족하므로 프론트와 함께 API 명세 재작성 요함 -> ex) 체팅방 명
+        // 오픈 비두 서버에서 미디어 데이터를 받아올 떄 사용할 토큰을 리턴.
+        // 채팅방 생성 후 최초 채팅방 생성자는 채팅방에 즉시 입장할 것으로 예상 -> 채팅방이 보여지기 위한 정보들을 리턴
         return RoomCreateResponseDto.builder()
                 .sessionId(savedRoom.getSessionId())
                 .roomTitle(savedRoom.getRoomTitle())
@@ -129,7 +127,7 @@ public class RoomService {
 
     // 전체 방 조회하기
     public Page<Room> getAllRooms(int page) {
-        PageRequest pageable = PageRequest.of(page-1,7);
+        PageRequest pageable = PageRequest.of(page-1,6);
 
         Page<Room> all = roomRepository.findAll(pageable);
 
@@ -165,7 +163,7 @@ public class RoomService {
         }
 
         //채팅방 입장 시 토큰 발급
-        enterRoomCreateSession(member,room.getSessionId());
+        String enterRoomToken = enterRoomCreateSession(member,room.getSessionId());
 
         // 채팅방 인원
         RoomMember roomMembers = RoomMember.builder()
@@ -174,6 +172,7 @@ public class RoomService {
                 .nickname(member.getNickName())
                 .email(member.getEmail())
                 .ProfileImage(member.getProfileImage())
+                .enterRoomToken(enterRoomToken)
                 .build();
 
         // 채팅방 인원 저장하기
@@ -211,6 +210,7 @@ public class RoomService {
                 .nickname(roomMembers.getNickname())
                 .email(roomMembers.getEmail())
                 .ProfileImage(roomMembers.getProfileImage())
+                .enterRoomToken(roomMembers.getEnterRoomToken())
                 .roomMaster(roomMaster)
                 .build();
     }
@@ -293,7 +293,7 @@ public class RoomService {
             throw new PrivateException(ErrorCode.NOT_FOUND_ROOM);
         }
 
-        // 2. Openvidu에 유저 토큰 발급 요청 : 오픈비두 서버에 요청 유저가 타겟 채팅방에 입장할 수 있는 토큰을 발급해주세요 요청한다.
+        // 2. Openvidu에 유저 토큰 발급 요청 : 오픈비두 서버에 요청 유저가 타겟 채팅방에 입장할 수 있는 토큰을 발급 요청
         //토큰을 가져옴
         return session.createConnection(connectionProperties).getToken();
     }

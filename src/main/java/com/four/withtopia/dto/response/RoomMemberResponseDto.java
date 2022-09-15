@@ -29,6 +29,8 @@ public class RoomMemberResponseDto {
     // 방장인지 확인
     private boolean roomMaster;
 
+    private String enterRoomToken;
+
     public RoomMemberResponseDto(RoomMember entity, boolean a){
         this.roomMemberId = entity.getRoomMemberId();
         this.sessionId = entity.getSessionId();
@@ -36,6 +38,7 @@ public class RoomMemberResponseDto {
         this.nickname = entity.getNickname();
         this.email = entity.getEmail();
         this.ProfileImage = entity.getProfileImage();
+        this.enterRoomToken = entity.getEnterRoomToken();
         this.roomMaster = a;
     }
 
