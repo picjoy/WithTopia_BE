@@ -54,6 +54,15 @@ dependencies {
 //    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.10.RELEASE'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
+    // 인증번호 유효시간 동안 저장
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    //redis
+    implementation 'it.ozimov:embedded-redis:0.7.2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    //      WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:sockjs-client:1.1.2'
+    implementation 'org.webjars:stomp-websocket:2.3.3-1'
 }
 
 tasks.named('test') {
