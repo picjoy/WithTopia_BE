@@ -54,16 +54,15 @@ public class RoomController {
     @DeleteMapping("/room/{roomId}")
     public ResponseEntity<PrivateResponseBody> outRoom(@PathVariable String roomId, @AuthenticationPrincipal UserDetailsImpl userDetails){
         Member member = ((UserDetailsImpl) userDetails).getMember();
-        roomService.outRoom(roomId, member);
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, null), HttpStatus.OK);
+        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.outRoom(roomId, member)), HttpStatus.OK);
     }
 
     // 일반 멤버 나가기
+    @ApiOperation(value = "일반 멤버 나가기 메소드")
     @PostMapping ("/room/{roomId}/member")
     public ResponseEntity<PrivateResponseBody> outRoomMember(@PathVariable String roomId,@AuthenticationPrincipal UserDetailsImpl userDetails){
         Member member = ((UserDetailsImpl) userDetails).getMember();
-        roomService.outRoomMember(roomId,member);
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, null), HttpStatus.OK);
+        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.outRoomMember(roomId,member)), HttpStatus.OK);
     }
 
     // 방제 수정
