@@ -19,10 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -214,17 +211,26 @@ public class RoomService {
                 .roomMaster(roomMaster)
                 .build();
     }
-/*
+
     // 일반 멤버 나가기
     public void outRoomMember(String sessionId, Member member) {
         // 방이 있는 지 확인
         Room room = roomRepository.findById(sessionId).orElseThrow(
                 () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM));
 
-        roomMemberRepository.delete(member);
+        // 멤버가 있는 지 확인
+        RoomMember roomMember = isPresentRoomMember(member);
 
+        roomMemberRepository.delete(roomMember);
     }
-*/
+
+    // 방에 멤버가 있는 지 확인하기
+    private RoomMember isPresentRoomMember(Member member) {
+        Optional<RoomMember> optionalRoomMember = roomMemberRepository.findById(member.getMemberId());
+        return optionalRoomMember.orElseThrow(
+                () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM_MEMBER)
+        );
+    }
 
 
     // 방제 수정
