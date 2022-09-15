@@ -33,5 +33,8 @@ public class RoomMember {
     @Column
     private String ProfileImage;
 
+    @Column
+    private String enterRoomToken;
+
 
 }
