@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.index.Indexed;
 @AllArgsConstructor
 @Getter
 @Setter
-@RedisHash(value = "auth",timeToLive = 30)
+@RedisHash(value = "auth",timeToLive = 180)
 public class EmailAuth {
 
     @Id
