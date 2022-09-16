@@ -12,12 +12,15 @@ import com.four.withtopia.util.MemberCheckUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Service
+@EnableScheduling
 @RequiredArgsConstructor
 public class VoteService {
     private final VoteRepository voteRepository;
@@ -59,5 +62,11 @@ public class VoteService {
         VoteResponseDto responseDto = VoteResponseDto.createVoteResponse(rankSave);
 
         return new ResponseEntity(new PrivateResponseBody(ErrorCode.OK, responseDto), HttpStatus.OK);
+    }
+
+    // 자정이 지나면 투표 내역이 리셋
+    @Scheduled(cron = "0 0 0 * * *")// 초(0~59) 분(0~59) 시(0~23) 일(1-31) 월(1-12) 요일(0 = 일 ~ 7 = 토)
+    public void scheduleRun(){
+        voteRepository.deleteAll();
     }
 }
