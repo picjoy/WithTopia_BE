@@ -5,7 +5,6 @@ import com.four.withtopia.dto.request.ProfileUpdateRequestDto;
 import com.four.withtopia.util.Timestamped;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
@@ -44,11 +43,6 @@ public class Member extends Timestamped {
     @Column
     private String googleId;
 
-    @Column
-    @Builder.Default
-    private long likeCnt = 0;
-
-    @Builder
     public Member(MemberRequestDto requestDto,String password,String image) {
         this.nickName = requestDto.getNickname();
         this.email = requestDto.getEmail();
@@ -104,7 +98,4 @@ public class Member extends Timestamped {
         this.isDelete = true;
     }
 
-    public void updatePopularity(Long likCnt){
-        this.likeCnt = likCnt;
-    }
 }

@@ -3,8 +3,8 @@ package com.four.withtopia.api.service;
 import com.four.withtopia.config.error.ErrorCode;
 import com.four.withtopia.config.expection.PrivateResponseBody;
 import com.four.withtopia.db.domain.Member;
+import com.four.withtopia.db.domain.Rank;
 import com.four.withtopia.db.domain.Vote;
-import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.VoteRepository;
 import com.four.withtopia.dto.request.VoteRequestDto;
 import com.four.withtopia.dto.response.VoteResponseDto;
@@ -12,18 +12,20 @@ import com.four.withtopia.util.MemberCheckUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 @Service
+@EnableScheduling
 @RequiredArgsConstructor
 public class VoteService {
     private final VoteRepository voteRepository;
     private final MemberCheckUtils memberCheckUtils;
-    private final MemberRepository memberRepository;
+    private final RankService rankService;
 
     @Transactional
     public ResponseEntity<?> vote(VoteRequestDto requestDto, HttpServletRequest request){
@@ -42,7 +44,7 @@ public class VoteService {
         }
 
         // 이 멤버가 투표를 안 했다면?
-        // 투표를 생성하고, 좋아요를 올린다.
+        // 투표를 생성하고, 랭크에 좋아요를 받은 사람을 등록
         Vote vote = Vote.builder()
                 .voteBy(voteByMember.getNickName())
                 .voteTo(requestDto.getNickname())
@@ -50,36 +52,21 @@ public class VoteService {
 
         voteRepository.save(vote);
 
-        // 투표 받는 멤버 찾기
-        Optional<Member> voteToMember = memberRepository.findByNickName(requestDto.getNickname());
-
-        // 투표 받는 멤버가 없다면 에러코드 발생
-        if(voteToMember == null || voteToMember.isEmpty()){
-            return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.POST_MEMEBER_NOT_FOUND_ERROR), HttpStatus.BAD_REQUEST);
+        Rank rankSave = rankService.rankSave(requestDto);
+        System.out.println("rankSave = " + rankSave);
+        if(rankSave == null){
+            // 좋아요를 받은 내역이 없는 사람이 싫어요를 받는다면 에러 "더 이상 내려갈 인기도가 없습니다." 메세지 보내기
+            return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.HAVE_NOT_POPULARITY_ERROR), HttpStatus.BAD_REQUEST);
         }
 
-        // 싫어요를 받으면 lick count 내리기
-        if(!requestDto.isVote()){
-            if(voteToMember.get().getLikeCnt() == 0){
-                // 인기도가 이미 0이라면
-                return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.HAVE_NOT_POPULARITY_ERROR), HttpStatus.BAD_REQUEST);
-            }
-            Long likeCnt = voteToMember.get().getLikeCnt() - 1;
-            VoteResponseDto responseDto = getVoteResponseDto(voteToMember, likeCnt);
-            return new ResponseEntity(new PrivateResponseBody(ErrorCode.OK, responseDto), HttpStatus.OK);
-        }
+        VoteResponseDto responseDto = VoteResponseDto.createVoteResponse(rankSave);
 
-        // 좋아요를 받는다면 like count 올라가기
-        Long likeCnt = voteToMember.get().getLikeCnt() + 1;
-        VoteResponseDto responseDto = getVoteResponseDto(voteToMember, likeCnt);
         return new ResponseEntity(new PrivateResponseBody(ErrorCode.OK, responseDto), HttpStatus.OK);
     }
 
-    private VoteResponseDto getVoteResponseDto(Optional<Member> voteToMember, Long likeCnt) {
-        voteToMember.get().updatePopularity(likeCnt);
-        memberRepository.save(voteToMember.get());
-        VoteResponseDto responseDto = VoteResponseDto.createVoteResponse(voteToMember.get());
-        return responseDto;
+    // 자정이 지나면 투표 내역이 리셋
+    @Scheduled(cron = "0 0 0 * * *")// 초(0~59) 분(0~59) 시(0~23) 일(1-31) 월(1-12) 요일(0 = 일 ~ 7 = 토)
+    public void scheduleRun(){
+        voteRepository.deleteAll();
     }
-
 }
