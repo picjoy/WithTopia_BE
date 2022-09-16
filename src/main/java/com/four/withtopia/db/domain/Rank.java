@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@Entity(name = "Top")
+@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
