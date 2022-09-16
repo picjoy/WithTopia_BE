@@ -69,14 +69,8 @@ public class TokenProvider {
                 .nickname(member.getNickName())
                 .value(refreshToken)
                 .build();
-        RefreshToken Token = isPresentRefreshToken(member);
 
-        if(Token == null){
-            refreshTokenRepository.save(refreshTokenObject);
-        } else {
-            Token.updateValue(refreshToken);
-            refreshTokenRepository.save(Token);
-        }
+        refreshTokenRepository.save(refreshTokenObject);
         return refreshToken;
     }
     // -------------------------------------------------------인증 정보로 부터 유저 정보를 가져옴
@@ -93,13 +87,18 @@ public class TokenProvider {
     public String ReissueAccessToken(String Refresh){
         long now = (new Date().getTime());
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-        RefreshToken Token = refreshTokenRepository.findByValue(Refresh);
-        return Jwts.builder()
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(Refresh).getBody();
+        RefreshToken Token = refreshTokenRepository.findByValue(claims.getSubject());
+        String JWT = Jwts.builder()
                 .setSubject(Token.getNickname())
                 .claim(AUTHORITIES_KEY, Authority.ROLE_MEMBER.toString())
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+
+        Token.updateValue(JWT);
+        refreshTokenRepository.save(Token);
+        return JWT;
     }
     public boolean validateToken(String token) {
         try {
