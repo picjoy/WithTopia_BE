@@ -30,6 +30,7 @@ application-jisung.properties
 application-wonyoung.properties
 application.yml
 openvidu-selfsigned.jks
+build.gradle
 
 ### NetBeans ###
 /nbproject/private/
