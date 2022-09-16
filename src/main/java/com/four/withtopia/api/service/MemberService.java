@@ -130,12 +130,12 @@ public class MemberService {
         if (validationUtil.nicknameExist(requestDto.getNickname())) {
             return ResponseEntity.ok("이미 회원가입된 닉네임 입니다.");
         }
-        if (requestDto.getAuthKey() == null) {
-            return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
-        }
-        if (validationUtil.emailAuth(requestDto)) {
-            return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
-        }
+//        if (requestDto.getAuthKey() == null) {
+//            return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
+//        }
+//        if (validationUtil.emailAuth(requestDto)) {
+//            return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
+//        }
         if (!(validationUtil.passwordCheck(requestDto))) {
             return ResponseEntity.ok("비밀번호가 다릅니다.");
         }

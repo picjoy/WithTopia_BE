@@ -1,10 +1,12 @@
 package com.four.withtopia.dto.response;
 
-import com.four.withtopia.db.domain.Rank;
+import com.four.withtopia.db.domain.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Optional;
 
 @Getter
 @Builder
@@ -14,9 +16,9 @@ public class VoteResponseDto {
     private String nickname;
     private Long likeCnt;
 
-    public static VoteResponseDto createVoteResponse(Rank rank){
+    public static VoteResponseDto createVoteResponse(Member rank){
         return VoteResponseDto.builder()
-                .nickname(rank.getNickname())
+                .nickname(rank.getNickName())
                 .likeCnt(rank.getLikeCnt())
                 .build();
     }
