@@ -73,17 +73,4 @@ public class RoomController {
         return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.renameRoom(roomId, member, roomTitle)), HttpStatus.OK);
     }
 
-
-    // 키워드로 방 검색
-    @ApiOperation(value = "방 찾기 메소드")
-    @GetMapping("/rooms/search/{page}")
-    public ResponseEntity<PrivateResponseBody> searchRoom(@PathVariable int page, @RequestBody String keyword){
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.searchRoom(keyword,page)), HttpStatus.OK);
-    }
-
-
-
-
-
-
 }

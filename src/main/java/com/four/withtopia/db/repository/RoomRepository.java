@@ -12,10 +12,9 @@ import java.util.Optional;
 public interface RoomRepository extends JpaRepository<Room, String> {
     void delete(Room room);
 
+    //List<Room> findAllBySessionId(String sessionId);
+
     Page<Room> findAll(Pageable pageable);
 
-
-    // Containing을 붙여주면 Like 검색이 가능
-    // %{keyword}%가 가능
-    Page<Room> findByRoomTitleContaining(String keyword, Pageable pageable);
+    Optional<Room> findBySessionId(String sessionId);
 }
