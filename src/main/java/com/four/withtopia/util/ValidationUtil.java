@@ -35,10 +35,6 @@ public class ValidationUtil {
         return !Objects.equals(emailAuth.getAuth(), requestDto.getAuthKey());
     }
 
-    public boolean emailexist(MemberRequestDto requestDto){
-        return emailAuthRepository.existsByEmail(requestDto.getEmail());
-    }
-
 
 //    비밀번호 = 비밀번호 확인 체크 (회원가입)
     public boolean passwordCheck(MemberRequestDto requestDto){
