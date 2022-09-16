@@ -21,7 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @RequiredArgsConstructor
 @Service
@@ -120,31 +123,35 @@ public class MemberService {
     tokenToSessions(accessToken, refreshToken, session);
   }
 
-  public ResponseEntity<?> createMember(MemberRequestDto requestDto) {
-    if (validationUtil.emailExist(requestDto.getEmail())){
-      return ResponseEntity.ok("이미 회원가입된 이메일 입니다.");
-    }
-    if (validationUtil.nicknameExist(requestDto.getNickname())){
-      return ResponseEntity.ok("이미 회원가입된 닉네임 입니다.");
-    }
-    if (requestDto.getAuthKey() == null) {
-      return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
-    }
-    if (validationUtil.emailAuth(requestDto)){
-      return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
-    }
-    if (!(validationUtil.passwordCheck(requestDto))){
-      return ResponseEntity.ok("비밀번호가 다릅니다.");
-    }
+    public ResponseEntity<?> createMember(MemberRequestDto requestDto) {
+        if (validationUtil.emailExist(requestDto.getEmail())) {
+            return ResponseEntity.ok("이미 회원가입된 이메일 입니다.");
+        }
+        if (validationUtil.nicknameExist(requestDto.getNickname())) {
+            return ResponseEntity.ok("이미 회원가입된 닉네임 입니다.");
+        }
+        if (requestDto.getAuthKey() == null) {
+            return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
+        }
+        if (validationUtil.emailAuth(requestDto)) {
+            return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
+        }
+        if (!(validationUtil.passwordCheck(requestDto))) {
+            return ResponseEntity.ok("비밀번호가 다릅니다.");
+        }
 //    List<ProfileImage> images = profileImageRepository.findAll();
-//    Long randomInt = (long) new Random().nextInt(images.size()+1)-1;
+        int randomInt = new Random().nextInt(3);
 
 //    Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()),profileImageRepository.getReferenceById(randomInt).getProfileIamge());
-      String img = "https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/original.jpeg";
-    Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()),img);
-    memberRepository.save(member);
-    return ResponseEntity.ok("success");
-  }
+        List<String> img = new ArrayList<>();
+        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/original.jpeg");
+        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/winter.png");
+        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/cat.png");
+        Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()), img.get(randomInt));
+
+        memberRepository.save(member);
+        return ResponseEntity.ok("success");
+}
 
   public ResponseEntity<?> ChangePw(MemberRequestDto requestDto) {
     if (!validationUtil.emailExist(requestDto.getEmail())){
