@@ -133,6 +133,16 @@ public class RoomService {
         return all;
     }
 
+    // 키워드로 채팅방 검색하기
+    public Page<Room> searchRoom(String keyword, int page) {
+        PageRequest pageable = PageRequest.of(page-1,6);
+
+        Page<Room> searchRoom = roomRepository.findByRoomTitleContaining(keyword, pageable);
+
+        return searchRoom;
+
+    }
+
     // 방장 방 나가기
     public ResponseEntity<?> outRoom(String sessionId, Member member){
 
@@ -262,6 +272,7 @@ public class RoomService {
         return room.getRoomTitle();
 
     }
+
     // 채팅방 생성 시 토큰 발급
     private RoomCreateResponseDto createNewToken(Member member) throws OpenViduJavaClientException, OpenViduHttpException {
 
