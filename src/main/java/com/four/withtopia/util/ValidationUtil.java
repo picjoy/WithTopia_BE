@@ -29,7 +29,14 @@ public class ValidationUtil {
     //    아이디 인증 여부 체크 (회원가입) (True면 인증안됨)
     public boolean emailAuth(MemberRequestDto requestDto){
         EmailAuth emailAuth = emailAuthRepository.findByEmail(requestDto.getEmail());
+        if (emailAuth == null){
+            return true;
+        }
         return !Objects.equals(emailAuth.getAuth(), requestDto.getAuthKey());
+    }
+
+    public boolean emailexist(MemberRequestDto requestDto){
+        return emailAuthRepository.existsByEmail(requestDto.getEmail());
     }
 
 

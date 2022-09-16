@@ -72,7 +72,7 @@ public class JwtFilter extends OncePerRequestFilter {
 //            Refresh token 유효성 확인 (True시 유효토큰)
             if (tokenProvider.validateToken(resolveRefresh(request))) {
 //                access 토큰 리이슈 및 재발급
-                jwt = tokenProvider.ReissueAccessToken(resolveToken(request));
+                jwt = tokenProvider.ReissueAccessToken(resolveRefresh(request));
                 response.addHeader(AUTHORIZATION_HEADER,jwt);
             }
         }

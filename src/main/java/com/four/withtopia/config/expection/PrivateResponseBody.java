@@ -24,4 +24,8 @@ public class PrivateResponseBody {
     }
 
 
+    public PrivateResponseBody(Exception e) {
+        this.statusMsg = e.getMessage();
+    }
+
 }
