@@ -10,12 +10,14 @@ import com.four.withtopia.db.repository.RoomMemberRepository;
 import com.four.withtopia.db.repository.RoomRepository;
 import com.four.withtopia.dto.request.MakeRoomRequestDto;
 import com.four.withtopia.dto.response.RoomCreateResponseDto;
+import com.four.withtopia.dto.response.RoomMainResponseDto;
 import com.four.withtopia.dto.response.RoomMemberResponseDto;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -47,7 +49,6 @@ public class RoomService {
     }
 
     // 방 생성
-    // 완성 -> 배포해서 프론트가 테스트
     public RoomCreateResponseDto createRoom(MakeRoomRequestDto makeRoomRequestDto, Member member) throws OpenViduJavaClientException, OpenViduHttpException {
 
         // 새로운 채팅방 생성
@@ -129,12 +130,11 @@ public class RoomService {
         Page<Room> all = roomRepository.findAll(pageable);
 
 
-
         return all;
     }
 
     // 방장 방 나가기
-    public void outRoom(String sessionId, Member member){
+    public ResponseEntity<?> outRoom(String sessionId, Member member){
 
         // 채팅방 찾기
         Room room = roomRepository.findById(sessionId).orElseThrow(
@@ -145,6 +145,8 @@ public class RoomService {
             throw new PrivateException(ErrorCode.MEMBER_NOT_AUTH_ERROR_ROOM);
         }
         roomRepository.delete(room);
+
+        return ResponseEntity.ok(ErrorCode.OK);
     }
 
     // 방 접속
@@ -159,11 +161,18 @@ public class RoomService {
             throw new PrivateException(ErrorCode.ROOM_IS_FULL);
         }
 
+        // 룸 멤버 있는 지 확인
+        RoomMember alreadyRoomMember = isPresentRoomMember(member);
+        if (null != alreadyRoomMember){
+            throw new PrivateException(ErrorCode.ALREADY_IN_ROOM_MEMBER);
+        }
+
+
         //채팅방 입장 시 토큰 발급
         String enterRoomToken = enterRoomCreateSession(member,room.getSessionId());
 
         // 채팅방 인원
-        RoomMember roomMembers = RoomMember.builder()
+        RoomMember roomMember = RoomMember.builder()
                 .sessionId(room.getSessionId())
                 .member(member.getMemberId())
                 .nickname(member.getNickName())
@@ -173,7 +182,7 @@ public class RoomService {
                 .build();
 
         // 채팅방 인원 저장하기
-        roomMemberRepository.save(roomMembers);
+        roomMemberRepository.save(roomMember);
 
         boolean roomMaster = false;
         List<RoomMember> roomMemberList = roomMemberRepository.findAllBySessionId(room.getSessionId());
@@ -181,16 +190,16 @@ public class RoomService {
         List<RoomMemberResponseDto> roomMemberResponseDtoList = new ArrayList<>();
 
         // 채팅방 인원 추가
-        for (RoomMember roomMember : roomMemberList){
+        for (RoomMember addRoomMember : roomMemberList){
             // 방장일 시
             if (member != null){
-                roomMaster = Objects.equals(roomMember.getNickname(), member.getNickName());
+                roomMaster = Objects.equals(addRoomMember.getNickname(), member.getNickName());
             }
             // 방장이 아닐 시
             else {
                 roomMaster = false;
             }
-            roomMemberResponseDtoList.add(new RoomMemberResponseDto(roomMember,roomMaster));
+            roomMemberResponseDtoList.add(new RoomMemberResponseDto(addRoomMember,roomMaster));
 
         }
 
@@ -201,37 +210,39 @@ public class RoomService {
         roomRepository.save(room);
 
         return RoomMemberResponseDto.builder()
-                .roomMemberId(roomMembers.getRoomMemberId())
-                .sessionId(roomMembers.getSessionId())
-                .member(roomMembers.getMember())
-                .nickname(roomMembers.getNickname())
-                .email(roomMembers.getEmail())
-                .ProfileImage(roomMembers.getProfileImage())
-                .enterRoomToken(roomMembers.getEnterRoomToken())
+                .roomMemberId(roomMember.getRoomMemberId())
+                .sessionId(roomMember.getSessionId())
+                .member(roomMember.getMember())
+                .nickname(roomMember.getNickname())
+                .email(roomMember.getEmail())
+                .ProfileImage(roomMember.getProfileImage())
+                .enterRoomToken(roomMember.getEnterRoomToken())
                 .roomMaster(roomMaster)
                 .build();
     }
 
+    private RoomMember isPresentRoomMember(Member member) {
+        Optional<RoomMember> optionalRoomMember = roomMemberRepository.findByNickname(member.getNickName());
+        return optionalRoomMember.orElse(null);
+    }
+
     // 일반 멤버 나가기
-    public void outRoomMember(String sessionId, Member member) {
+    public ResponseEntity<?> outRoomMember(String sessionId, Member member) {
+
         // 방이 있는 지 확인
         Room room = roomRepository.findById(sessionId).orElseThrow(
                 () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM));
 
-        // 멤버가 있는 지 확인
-        RoomMember roomMember = isPresentRoomMember(member);
-
-        roomMemberRepository.delete(roomMember);
-    }
-
-    // 방에 멤버가 있는 지 확인하기
-    private RoomMember isPresentRoomMember(Member member) {
-        Optional<RoomMember> optionalRoomMember = roomMemberRepository.findById(member.getMemberId());
-        return optionalRoomMember.orElseThrow(
+        // 룸 멤버 찾기
+        RoomMember roomMember = roomMemberRepository.findBySessionIdAndNickname(sessionId,member.getNickName()).orElseThrow(
                 () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM_MEMBER)
         );
-    }
 
+        // 룸 멤버 삭제
+        roomMemberRepository.delete(roomMember);
+
+        return ResponseEntity.ok(ErrorCode.OK);
+    }
 
     // 방제 수정
     public String renameRoom(String roomId, Member member, String roomTitle) {
