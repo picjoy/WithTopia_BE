@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +54,9 @@ public class MypageService {
         member.deleteMember();
         memberRepository.save(member);
 
+        // 3일 뒤 회원 지우기
+        memberDelete();
+
         return ResponseEntity.ok("success");
     }
 
@@ -68,5 +73,27 @@ public class MypageService {
         member.updatePw(password);
         memberRepository.save(member);
         return ResponseEntity.ok("success");
+    }
+
+    // 회원이 탈퇴한 후 3일이 지나면 회원 내역 삭제
+    public void memberDelete(){
+        // 3일 뒤
+        long lateTime = 1000 * 60 * 60 * 24 * 3;
+//
+//        Member deleteMember = memberRepository.findByIsDelete(true);
+//        System.out.println("멤버 찾음");
+
+        Timer finalDelete = new Timer();
+        TimerTask deleteTask = new TimerTask() {
+            @Override
+            public void run() {
+                // 멤버 지우기
+                Member deleteMember = memberRepository.findByIsDelete(true);
+                memberRepository.delete(deleteMember);
+                finalDelete.cancel();
+            }
+        };
+
+        finalDelete.schedule(deleteTask, 60000);
     }
 }
