@@ -7,6 +7,7 @@ import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.repository.RefreshTokenRepository;
 import com.four.withtopia.dto.request.LoginRequestDto;
 import com.four.withtopia.dto.request.MemberRequestDto;
+import com.four.withtopia.dto.request.NicknameRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,8 +56,8 @@ public class MemberController {
   }
 
   @RequestMapping(value = "/member/nickname", method = RequestMethod.POST)
-  public ResponseEntity<?> existnick(@RequestBody String email){
-    return memberService.existnickname(email);
+  public ResponseEntity<?> existnick(@RequestBody NicknameRequestDto email){
+    return memberService.existnickname(email.getNickname());
   }
 
   @RequestMapping(value = "/member/test", method = RequestMethod.GET)
