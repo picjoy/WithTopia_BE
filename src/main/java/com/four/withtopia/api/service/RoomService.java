@@ -11,6 +11,7 @@ import com.four.withtopia.db.repository.RoomRepository;
 import com.four.withtopia.dto.request.MakeRoomRequestDto;
 import com.four.withtopia.dto.response.RoomCreateResponseDto;
 import com.four.withtopia.dto.response.RoomMemberResponseDto;
+import com.four.withtopia.util.MemberCheckUtils;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 
@@ -29,6 +31,7 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomMemberRepository roomMemberRepository;
+    private final MemberCheckUtils memberCheckUtils;
 
     // SDK의 진입점인 OpenVidu 개체
     private OpenVidu openVidu;
@@ -47,7 +50,10 @@ public class RoomService {
     }
 
     // 방 생성
-    public RoomCreateResponseDto createRoom(MakeRoomRequestDto makeRoomRequestDto, Member member) throws OpenViduJavaClientException, OpenViduHttpException {
+    public RoomCreateResponseDto createRoom(MakeRoomRequestDto makeRoomRequestDto, HttpServletRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+
+        //토큰 검증 및 멤버 객체 가져오기
+        Member member = memberCheckUtils.checkMember(request);
 
         // 새로운 채팅방 생성
         RoomCreateResponseDto newToken = createNewToken(member);
@@ -125,10 +131,9 @@ public class RoomService {
     public Page<Room> getAllRooms(int page) {
         PageRequest pageable = PageRequest.of(page-1,6);
 
-        Page<Room> all = roomRepository.findAllByOrderByModifiedAtDesc(pageable);
+        Page<Room> publicRooms = roomRepository.findByStatusOrderByModifiedAtDesc(pageable, true);
 
-
-        return all;
+        return publicRooms;
     }
 
     // 키워드로 채팅방 검색하기
@@ -142,7 +147,10 @@ public class RoomService {
     }
 
     // 방장 방 나가기
-    public ResponseEntity<?> outRoom(String sessionId, Member member){
+    public ResponseEntity<?> outRoom(String sessionId, HttpServletRequest request){
+
+        //토큰 검증 및 멤버 객체 가져오기
+        Member member = memberCheckUtils.checkMember(request);
 
         // 채팅방 찾기
         Room room = roomRepository.findById(sessionId).orElseThrow(
@@ -158,7 +166,10 @@ public class RoomService {
     }
 
     // 방 접속
-    public RoomMemberResponseDto getRoomData(String SessionId, Member member) throws OpenViduJavaClientException, OpenViduHttpException {
+    public RoomMemberResponseDto getRoomData(String SessionId, HttpServletRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+
+        //토큰 검증 및 멤버 객체 가져오기
+        Member member = memberCheckUtils.checkMember(request);
 
         // 방이 있는 지 확인
         Room room = roomRepository.findById(SessionId).orElseThrow(
@@ -229,7 +240,10 @@ public class RoomService {
     }
 
     // 일반 멤버 나가기
-    public ResponseEntity<?> outRoomMember(String sessionId, Member member) {
+    public ResponseEntity<?> outRoomMember(String sessionId, HttpServletRequest request) {
+
+        //토큰 검증 및 멤버 객체 가져오기
+        Member member = memberCheckUtils.checkMember(request);
 
         // 방이 있는 지 확인
         Room room = roomRepository.findById(sessionId).orElseThrow(
@@ -253,7 +267,11 @@ public class RoomService {
     }
 
     // 방제 수정
-    public String renameRoom(String roomId, Member member, String roomTitle) {
+    public String renameRoom(String roomId, HttpServletRequest request, String roomTitle) {
+
+        //토큰 검증 및 멤버 객체 가져오기
+        Member member = memberCheckUtils.checkMember(request);
+
         // 채팅방 찾기
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM));
