@@ -125,7 +125,7 @@ public class RoomService {
     public Page<Room> getAllRooms(int page) {
         PageRequest pageable = PageRequest.of(page-1,6);
 
-        Page<Room> all = roomRepository.findAll(pageable);
+        Page<Room> all = roomRepository.findAllByOrderByModifiedAtDesc(pageable);
 
 
         return all;
@@ -170,11 +170,10 @@ public class RoomService {
         }
 
         // 룸 멤버 있는 지 확인
-        RoomMember alreadyRoomMember = isPresentRoomMember(member);
-        if (null != alreadyRoomMember){
+        Optional<RoomMember> alreadyRoomMember = roomMemberRepository.findBySessionIdAndNickname(SessionId,member.getNickName());
+        if (alreadyRoomMember.isPresent()){
             throw new PrivateException(ErrorCode.ALREADY_IN_ROOM_MEMBER);
         }
-
 
         //채팅방 입장 시 토큰 발급
         String enterRoomToken = enterRoomCreateSession(member,room.getSessionId());
@@ -229,11 +228,6 @@ public class RoomService {
                 .build();
     }
 
-    private RoomMember isPresentRoomMember(Member member) {
-        Optional<RoomMember> optionalRoomMember = roomMemberRepository.findByNickname(member.getNickName());
-        return optionalRoomMember.orElse(null);
-    }
-
     // 일반 멤버 나가기
     public ResponseEntity<?> outRoomMember(String sessionId, Member member) {
 
@@ -248,6 +242,12 @@ public class RoomService {
 
         // 룸 멤버 삭제
         roomMemberRepository.delete(roomMember);
+
+        // 룸 멤버 수 변경
+        room.updateCntMember(room.getCntMember() -1);
+
+        // 룸 변경사항 저장
+        roomRepository.save(room);
 
         return ResponseEntity.ok(ErrorCode.OK);
     }
