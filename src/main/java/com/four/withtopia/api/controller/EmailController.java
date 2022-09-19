@@ -24,7 +24,6 @@ public class EmailController {
 // 이메일 인증 신청
     @RequestMapping(value = "/member/email/request",method = RequestMethod.POST)
     public ResponseEntity<?> emailRequest(@RequestBody EmailRequestDto email) throws MessagingException, UnsupportedEncodingException {
-
         //DB에 authKey 업데이트
         return mss.saveAuth(email.getEmail());
     }
