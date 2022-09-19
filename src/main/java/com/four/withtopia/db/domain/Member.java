@@ -46,7 +46,7 @@ public class Member extends Timestamped {
 
     @Column
     @Builder.Default
-    private long likeCnt = 0;
+    private long likeCount = 0;
 
     @Builder
     public Member(MemberRequestDto requestDto,String password,String image) {
@@ -105,6 +105,6 @@ public class Member extends Timestamped {
     }
 
     public void updatePopularity(Long likCnt){
-        this.likeCnt = likCnt;
+        this.likeCount = likCnt;
     }
 }

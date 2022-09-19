@@ -62,7 +62,7 @@ public class MemberService {
             .id(member.getMemberId())
             .nickname(member.getNickName())
             .email(member.getEmail())
-            .ProfileImage(member.getProfileImage())
+            .profileImage(member.getProfileImage())
             .build()
     );
   }
@@ -157,12 +157,12 @@ public class MemberService {
     if (!validationUtil.emailExist(requestDto.getEmail())){
       return ResponseEntity.ok("가입되지않은 EMAIL 입니다.");
     }
-    if (requestDto.getAuthKey() == null) {
+/*    if (requestDto.getAuthKey() == null) {
       return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
     }
     if (validationUtil.emailAuth(requestDto)){
       return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
-    }
+    }*/
     if (!(validationUtil.passwordCheck(requestDto))){
       return ResponseEntity.ok("비밀번호가 다릅니다.");
     }

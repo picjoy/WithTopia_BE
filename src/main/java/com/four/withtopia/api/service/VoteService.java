@@ -60,17 +60,17 @@ public class VoteService {
 
         // 싫어요를 받으면 lick count 내리기
         if(!requestDto.isVote()){
-            if(voteToMember.get().getLikeCnt() == 0){
+            if(voteToMember.get().getLikeCount() == 0){
                 // 인기도가 이미 0이라면
                 return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.HAVE_NOT_POPULARITY_ERROR), HttpStatus.BAD_REQUEST);
             }
-            Long likeCnt = voteToMember.get().getLikeCnt() - 1;
+            Long likeCnt = voteToMember.get().getLikeCount()- 1;
             VoteResponseDto responseDto = getVoteResponseDto(voteToMember, likeCnt);
             return new ResponseEntity(new PrivateResponseBody(ErrorCode.OK, responseDto), HttpStatus.OK);
         }
 
         // 좋아요를 받는다면 like count 올라가기
-        Long likeCnt = voteToMember.get().getLikeCnt() + 1;
+        Long likeCnt = voteToMember.get().getLikeCount() + 1;
         VoteResponseDto responseDto = getVoteResponseDto(voteToMember, likeCnt);
         return new ResponseEntity(new PrivateResponseBody(ErrorCode.OK, responseDto), HttpStatus.OK);
     }
