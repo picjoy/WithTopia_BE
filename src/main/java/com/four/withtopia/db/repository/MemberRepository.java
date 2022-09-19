@@ -26,6 +26,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Member findByGoogleId(String googleId);
 
-    Page<Member> findAllByOrderByLikeCountDesc(Pageable pageable);
-    List<Member> findTop3ByLikeCountGreaterThanOrderByLikeCountDesc(Long topMember);
+    Page<Member> findAllByOrderByLikeCountDescCreatedAtAsc(Pageable pageable);
+    List<Member> findTop3ByLikeCountGreaterThanOrderByLikeCountDescCreatedAtAsc(Long topMember);
 }
