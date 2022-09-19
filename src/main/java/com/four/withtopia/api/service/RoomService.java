@@ -131,10 +131,9 @@ public class RoomService {
     public Page<Room> getAllRooms(int page) {
         PageRequest pageable = PageRequest.of(page-1,6);
 
-        Page<Room> all = roomRepository.findAllByOrderByModifiedAtDesc(pageable);
+        Page<Room> publicRooms = roomRepository.findByStatusOrderByModifiedAtDesc(pageable, true);
 
-
-        return all;
+        return publicRooms;
     }
 
     // 키워드로 채팅방 검색하기
