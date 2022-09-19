@@ -79,9 +79,6 @@ public class MypageService {
     public void memberDelete(){
         // 3일 뒤
         long lateTime = 1000 * 60 * 60 * 24 * 3;
-//
-//        Member deleteMember = memberRepository.findByIsDelete(true);
-//        System.out.println("멤버 찾음");
 
         Timer finalDelete = new Timer();
         TimerTask deleteTask = new TimerTask() {
@@ -94,6 +91,6 @@ public class MypageService {
             }
         };
 
-        finalDelete.schedule(deleteTask, 60000);
+        finalDelete.schedule(deleteTask, lateTime);
     }
 }
