@@ -1,10 +1,12 @@
 package com.four.withtopia.api.service;
 
+import com.four.withtopia.config.expection.PrivateResponseBody;
 import com.four.withtopia.db.domain.EmailAuth;
 import com.four.withtopia.db.repository.EmailAuthRepository;
 import com.four.withtopia.dto.request.EmailAuthRequestDto;
 import com.four.withtopia.util.MailUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
@@ -46,10 +48,37 @@ public class MailSendService {
     }
 
     //인증메일 보내기
-    public String sendAuthMail(String email) {
+//    public String sendAuthMail(String email) throws MessagingException, UnsupportedEncodingException {
+//        //6자리 난수 인증번호 생성
+//        String authKey = getKey(6);
+//
+//        //인증메일 보내기
+//        try {
+//            MailUtils sendMail = new MailUtils(mailSender);
+//            sendMail.setSubject("회원가입 이메일 인증");
+//            sendMail.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
+//                    .append("<p>아래 번호를 인증 창에 붙여넣어주세요.</p>")
+//                    .append("<br>")
+//                    .append("<h1>").append(authKey).append("</h1>")
+//                    .toString());
+//            sendMail.setFrom("WithTopia", "Admin");
+//            sendMail.setTo(email);
+//            sendMail.send();
+//        } catch (MessagingException | UnsupportedEncodingException e) {
+//
+//
+//        }
+//        return authKey;
+//    }
+
+    public ResponseEntity<?> saveAuth(String email) throws MessagingException, UnsupportedEncodingException {
+        String emailpatern = "^[a-zA-Z0-9]+@[a-zA-Z0-9-]+[a-zA-Z0-9-.]+$";
+        if (!email.matches(emailpatern)){
+            return new ResponseEntity<>("이메일 양식이 아닙니다", HttpStatus.BAD_REQUEST);
+        }
+        //임의의 authKey 생성 & 이메일 발송
         //6자리 난수 인증번호 생성
         String authKey = getKey(6);
-
         //인증메일 보내기
         try {
             MailUtils sendMail = new MailUtils(mailSender);
@@ -62,17 +91,11 @@ public class MailSendService {
             sendMail.setFrom("WithTopia", "Admin");
             sendMail.setTo(email);
             sendMail.send();
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            return new ResponseEntity<>(new PrivateResponseBody(e), HttpStatus.BAD_REQUEST);
         }
-
-        return authKey;
-    }
-
-    public ResponseEntity<?> saveAuth(EmailAuth emailAuth) {
-
+        EmailAuth emailAuth = new EmailAuth(email,authKey);
+        // authKey : email 정보 저장
         EmailAuth origin = emailAuthRepository.findByEmail(emailAuth.getEmail());
         if (!(origin == null)) {
             origin.Update(emailAuth.getAuth());

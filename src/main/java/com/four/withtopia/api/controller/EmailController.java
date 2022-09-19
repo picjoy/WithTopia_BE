@@ -1,14 +1,17 @@
 package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.MailSendService;
-import com.four.withtopia.db.domain.EmailAuth;
 import com.four.withtopia.dto.request.EmailAuthRequestDto;
+import com.four.withtopia.dto.request.EmailRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,14 +22,9 @@ public class EmailController {
 
 // 이메일 인증 신청
     @RequestMapping(value = "/member/email/request",method = RequestMethod.POST)
-    public ResponseEntity<?> emailRequest(@RequestBody String email){
-
-        //임의의 authKey 생성 & 이메일 발송
-        String authKey = mss.sendAuthMail(email);
-        EmailAuth emailAuth = new EmailAuth(email,authKey);
-
+    public ResponseEntity<?> emailRequest(@RequestBody EmailRequestDto email) throws MessagingException, UnsupportedEncodingException {
         //DB에 authKey 업데이트
-        return mss.saveAuth(emailAuth);
+        return mss.saveAuth(email.getEmail());
     }
 
 //    이메일 인증 번호 비교
