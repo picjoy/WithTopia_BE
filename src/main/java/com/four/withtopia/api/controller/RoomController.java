@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -26,10 +28,9 @@ public class RoomController {
     // 방 생성
     @PostMapping("/create/room")
     @ApiOperation(value = "방 생성 메소드")
-    public ResponseEntity<PrivateResponseBody> makeRoom(@RequestBody MakeRoomRequestDto makeRoomRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails)
+    public ResponseEntity<PrivateResponseBody> makeRoom(@RequestBody MakeRoomRequestDto makeRoomRequestDto, HttpServletRequest request)
             throws OpenViduJavaClientException, OpenViduHttpException {
-        Member member = ((UserDetailsImpl) userDetails).getMember();
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK , roomService.createRoom(makeRoomRequestDto, member)) , HttpStatus.OK);
+        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK , roomService.createRoom(makeRoomRequestDto, request)) , HttpStatus.OK);
 
     }
 
@@ -43,34 +44,30 @@ public class RoomController {
     // 방 접속
     @ApiOperation(value = "일반 멤버 방 접속 메소드")
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<PrivateResponseBody> enterRoom(@PathVariable String roomId,@AuthenticationPrincipal UserDetailsImpl userDetails) throws OpenViduJavaClientException, OpenViduHttpException {
-        Member member = ((UserDetailsImpl) userDetails).getMember();
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK,roomService.getRoomData(roomId,member)) , HttpStatus.OK);
+    public ResponseEntity<PrivateResponseBody> enterRoom(@PathVariable String roomId, HttpServletRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK,roomService.getRoomData(roomId,request)) , HttpStatus.OK);
     }
 
 
     // 방장 나가기
     @ApiOperation(value = "방장 나가기 메소드")
     @DeleteMapping("/room/{roomId}")
-    public ResponseEntity<PrivateResponseBody> outRoom(@PathVariable String roomId, @AuthenticationPrincipal UserDetailsImpl userDetails){
-        Member member = ((UserDetailsImpl) userDetails).getMember();
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.outRoom(roomId, member)), HttpStatus.OK);
+    public ResponseEntity<PrivateResponseBody> outRoom(@PathVariable String roomId, HttpServletRequest request){
+        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.outRoom(roomId, request)), HttpStatus.OK);
     }
 
     // 일반 멤버 나가기
     @ApiOperation(value = "일반 멤버 나가기 메소드")
     @PostMapping ("/room/{roomId}/member")
-    public ResponseEntity<PrivateResponseBody> outRoomMember(@PathVariable String roomId,@AuthenticationPrincipal UserDetailsImpl userDetails){
-        Member member = ((UserDetailsImpl) userDetails).getMember();
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.outRoomMember(roomId,member)), HttpStatus.OK);
+    public ResponseEntity<PrivateResponseBody> outRoomMember(@PathVariable String roomId, HttpServletRequest request){
+        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.outRoomMember(roomId,request)), HttpStatus.OK);
     }
 
     // 방제 수정
     @ApiOperation(value = "방제 수정 메소드")
     @PutMapping("/room/{roomId}")
-    public ResponseEntity<PrivateResponseBody> renameRoom(@PathVariable String roomId, @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody String roomTitle){
-        Member member = ((UserDetailsImpl) userDetails).getMember();
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.renameRoom(roomId, member, roomTitle)), HttpStatus.OK);
+    public ResponseEntity<PrivateResponseBody> renameRoom(@PathVariable String roomId, HttpServletRequest request, @RequestBody String roomTitle){
+        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, roomService.renameRoom(roomId, request, roomTitle)), HttpStatus.OK);
     }
 
 
