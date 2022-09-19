@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 public interface RoomRepository extends JpaRepository<Room, String> {
     void delete(Room room);
 
+
     Page<Room> findAllByOrderByModifiedAtDesc(Pageable pageable);
+
 
 
     // Containing을 붙여주면 Like 검색이 가능
