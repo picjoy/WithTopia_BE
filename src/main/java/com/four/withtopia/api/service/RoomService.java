@@ -10,7 +10,6 @@ import com.four.withtopia.db.repository.RoomMemberRepository;
 import com.four.withtopia.db.repository.RoomRepository;
 import com.four.withtopia.dto.request.MakeRoomRequestDto;
 import com.four.withtopia.dto.response.RoomCreateResponseDto;
-import com.four.withtopia.dto.response.RoomMainResponseDto;
 import com.four.withtopia.dto.response.RoomMemberResponseDto;
 import io.openvidu.java.client.*;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 @Service

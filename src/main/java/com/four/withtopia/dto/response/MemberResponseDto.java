@@ -14,14 +14,15 @@ public class MemberResponseDto {
   private Long id;
   private String nickname;
   private String email;
-  private String ProfileImage;
+  private String profileImage;
+  private long likeCnt;
 
   public static MemberResponseDto createMemberResponseDto(Member member){
     return MemberResponseDto.builder()
             .id(member.getMemberId())
             .nickname(member.getNickName())
             .email(member.getEmail())
-            .ProfileImage(member.getProfileImage())
+            .profileImage(member.getProfileImage())
             .build();
   }
   public static MemberResponseDto createSocialMemberResponseDto(Member member){
@@ -32,7 +33,17 @@ public class MemberResponseDto {
             .id(member.getMemberId())
             .nickname(nickname[0])
             .email(member.getEmail())
-            .ProfileImage(member.getProfileImage())
+            .profileImage(member.getProfileImage())
+            .build();
+  }
+
+  public static MemberResponseDto memberResponseDto(Member member){
+    return MemberResponseDto.builder()
+            .id(member.getMemberId())
+            .nickname(member.getNickName())
+            .email(member.getEmail())
+            .profileImage(member.getProfileImage())
+            .likeCnt(member.getLikeCount())
             .build();
   }
 }

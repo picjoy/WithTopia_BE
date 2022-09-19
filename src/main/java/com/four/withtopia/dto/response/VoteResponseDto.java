@@ -19,7 +19,7 @@ public class VoteResponseDto {
     public static VoteResponseDto createVoteResponse(Member rank){
         return VoteResponseDto.builder()
                 .nickname(rank.getNickName())
-                .likeCnt(rank.getLikeCnt())
+                .likeCnt(rank.getLikeCount())
                 .build();
     }
 }
