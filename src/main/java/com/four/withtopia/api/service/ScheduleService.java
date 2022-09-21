@@ -1,16 +1,10 @@
 package com.four.withtopia.api.service;
 
-import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
 
 @EnableScheduling
 @RequiredArgsConstructor
@@ -23,5 +17,4 @@ public class ScheduleService {
     public void deleteVote(){
         voteRepository.deleteAll();
     }
-
 }

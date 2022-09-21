@@ -5,7 +5,6 @@ import com.four.withtopia.dto.request.ProfileUpdateRequestDto;
 import com.four.withtopia.util.Timestamped;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;

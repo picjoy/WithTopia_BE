@@ -47,6 +47,8 @@ public class Room extends Timestamped {
     }
 
     public boolean validateMember(Member member) {
+        System.out.println(member.getNickName());
+        System.out.println(this.masterId);
         return !this.masterId.equals(member.getNickName());
     }
 
