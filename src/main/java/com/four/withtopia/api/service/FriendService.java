@@ -11,7 +11,7 @@ import com.four.withtopia.util.MemberCheckUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,17 +37,17 @@ public class FriendService {
 
         // 해당 친구 찾기
         Member friend = memberRepository.findByNickName(friendName).orElseThrow(
-                () -> new PrivateException(ErrorCode.MEMBER_NOT_FOUND_FAIL));
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","유저가 아닙니다")));
 
         // 자기 자신과는 친구를 할 수 없습니다.
         if (Objects.equals(member.getNickName(), friend.getNickName())){
-            throw new PrivateException(ErrorCode.CAN_NOT_FRIEND_YOURSELF);
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","자신과는 친구가 될 수 없습니다."));
         }
 
         // 이미 친구인지 확인
         Optional<Friend> alreadyFriend = friendRepository.findByMyNicknameAndFriendNickname(member.getNickName(), friend.getNickName());
         if (alreadyFriend.isPresent()){
-            throw new PrivateException(ErrorCode.ALREADY_IN_MY_FRIEND);
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 친구입니다."));
         }
 
         // 친구 빌드
@@ -84,19 +84,19 @@ public class FriendService {
 
 
     //친구 삭제 메서드
-    public ResponseEntity<?> deleteFriend(String friendName, HttpServletRequest request) {
+    public String deleteFriend(String friendName, HttpServletRequest request) {
         //토큰 검증 및 멤버 객체 가져오기
         Member member = memberCheckUtils.checkMember(request);
 
         // 해당 친구 찾기
         Friend friend = friendRepository.findByMyNicknameAndFriendNickname(member.getNickName(), friendName).orElseThrow(
-                () -> new PrivateException(ErrorCode.NOT_FOUND_MY_FRIEND)
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","친구 리스트에서 해당 친구를 찾을 수 없습니다."))
         );
 
         // 친구 삭제
         friendRepository.delete(friend);
 
-        return ResponseEntity.ok(ErrorCode.OK);
+        return "Success";
 
 
     }

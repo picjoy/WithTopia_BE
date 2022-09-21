@@ -1,11 +1,9 @@
 package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.FriendService;
-import com.four.withtopia.config.error.ErrorCode;
-import com.four.withtopia.config.expection.PrivateResponseBody;
+import com.four.withtopia.util.ResponseUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,20 +17,20 @@ public class FriendController {
 
     @ApiOperation(value = "친구 추가 메소드")
     @PostMapping("/friend")
-    public ResponseEntity<PrivateResponseBody> makeFriend(@RequestBody String friendName, HttpServletRequest request){
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, friendService.makeFriend(friendName, request)), HttpStatus.OK);
+    public ResponseEntity<?> makeFriend(@RequestBody String friendName, HttpServletRequest request){
+        return new ResponseUtil<>().forSuccess(friendService.makeFriend(friendName, request));
     }
 
     @ApiOperation(value = "친구 삭제 메서드")
     @DeleteMapping("/friend")
-    public ResponseEntity<PrivateResponseBody> deleteFriend(@RequestBody String friendName, HttpServletRequest request){
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, friendService.deleteFriend(friendName, request)), HttpStatus.OK);
+    public ResponseEntity<?> deleteFriend(@RequestBody String friendName, HttpServletRequest request){
+        return new ResponseUtil<>().forSuccess(friendService.deleteFriend(friendName, request));
     }
 
     @ApiOperation(value = " 전체 친구 조회 메서드")
     @GetMapping("/friends/{page}")
-    public ResponseEntity<PrivateResponseBody> getAllFriends(@PathVariable int page, HttpServletRequest request){
-        return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK, friendService.getAllFriends(page, request)), HttpStatus.OK);
+    public ResponseEntity<?> getAllFriends(@PathVariable int page, HttpServletRequest request){
+        return new ResponseUtil<>().forSuccess(friendService.getAllFriends(page, request));
     }
 
 
