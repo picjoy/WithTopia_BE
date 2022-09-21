@@ -21,7 +21,4 @@ public class Rank {
     @Column
     private Long likeCnt;
 
-    public void updateLikeCnt(Long likeCnt){
-        this.likeCnt = likeCnt;
-    }
 }

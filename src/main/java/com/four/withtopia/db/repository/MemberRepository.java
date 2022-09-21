@@ -1,6 +1,7 @@
 package com.four.withtopia.db.repository;
 
 
+import com.four.withtopia.db.domain.Friend;
 import com.four.withtopia.db.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
