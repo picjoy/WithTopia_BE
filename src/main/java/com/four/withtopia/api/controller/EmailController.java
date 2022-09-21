@@ -1,13 +1,11 @@
 package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.MailSendService;
-import com.four.withtopia.config.error.ErrorCode;
-import com.four.withtopia.config.expection.PrivateResponseBody;
 import com.four.withtopia.dto.request.EmailAuthRequestDto;
 import com.four.withtopia.dto.request.EmailRequestDto;
+import com.four.withtopia.util.ResponseUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,13 +27,13 @@ public class EmailController {
     @RequestMapping(value = "/member/email/request", method = RequestMethod.POST)
     public ResponseEntity<?> emailRequest(@RequestBody EmailRequestDto email) throws MessagingException, UnsupportedEncodingException {
         //DB에 authKey 업데이트
-        return new ResponseEntity<>(new PrivateResponseBody(new ErrorCode(HttpStatus.OK, "0", "정상"), mss.saveAuth(email.getEmail())), HttpStatus.OK);
+        return new ResponseUtil<>().forSuccess(mss.saveAuth(email.getEmail()));
     }
 
     //    이메일 인증 번호 비교
     @ApiOperation(value = "이메일 인증")
     @RequestMapping(value = "/member/email/confirm", method = RequestMethod.POST)
     public ResponseEntity<?> emailConfirm(@RequestBody EmailAuthRequestDto requestDto) {
-        return new ResponseEntity<>(new PrivateResponseBody(new ErrorCode(HttpStatus.OK, "0", "정상"), mss.checkAuthKey(requestDto)), HttpStatus.OK);
+        return new ResponseUtil<>().forSuccess(mss.checkAuthKey(requestDto));
     }
 }
