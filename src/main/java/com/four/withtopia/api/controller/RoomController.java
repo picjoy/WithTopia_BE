@@ -4,8 +4,6 @@ package com.four.withtopia.api.controller;
 import com.four.withtopia.api.service.RoomService;
 import com.four.withtopia.config.error.ErrorCode;
 import com.four.withtopia.config.expection.PrivateResponseBody;
-import com.four.withtopia.config.security.UserDetailsImpl;
-import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.dto.request.MakeRoomRequestDto;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
@@ -13,7 +11,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +34,7 @@ public class RoomController {
     //전체 방 조회 페이지처리
     @ApiOperation(value = "방 전체 조회 메소드")
     @GetMapping("/rooms/{page}")
-    public ResponseEntity<?> getAllRooms(@PathVariable int page){
+    public ResponseEntity<PrivateResponseBody> getAllRooms(@PathVariable int page){
         return new ResponseEntity<>(new PrivateResponseBody(ErrorCode.OK , roomService.getAllRooms(page)), HttpStatus.OK);
     }
 
