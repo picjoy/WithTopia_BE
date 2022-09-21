@@ -32,5 +32,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findTop3ByLikeCountGreaterThanOrderByLikeCountDescCreatedAtAsc(Long topMember);
 
     Member findByIsDelete(boolean member);
-
 }
