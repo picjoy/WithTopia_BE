@@ -30,6 +30,9 @@ public class StompHandler implements ChannelInterceptor {
             log.info("connection success");
         }
         else if (command == DISCONNECT) { // Websocket 연결 종료
+
+            checkToken(accessor);
+
             log.info("DISCONNECT");
         }
 
