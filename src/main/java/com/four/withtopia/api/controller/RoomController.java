@@ -3,6 +3,9 @@ package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.RoomService;
 import com.four.withtopia.dto.request.MakeRoomRequestDto;
+import com.four.withtopia.dto.request.RoomPasswordRequestDto;
+import com.four.withtopia.dto.request.RoomSearchRequestDto;
+import com.four.withtopia.dto.request.RoomTitleRenameDto;
 import com.four.withtopia.util.ResponseUtil;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
@@ -12,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 
 @RestController
@@ -23,7 +27,7 @@ public class RoomController {
     // 방 생성
     @PostMapping("/create/room")
     @ApiOperation(value = "방 생성 메소드")
-    public ResponseEntity<?> makeRoom(@RequestBody MakeRoomRequestDto makeRoomRequestDto, HttpServletRequest request)
+    public ResponseEntity<?> makeRoom(@Valid @RequestBody MakeRoomRequestDto makeRoomRequestDto, HttpServletRequest request)
             throws OpenViduJavaClientException, OpenViduHttpException {
         return new ResponseUtil<>().forSuccess(roomService.createRoom(makeRoomRequestDto, request));
     }
@@ -38,8 +42,8 @@ public class RoomController {
     // 방 접속
     @ApiOperation(value = "일반 멤버 방 접속 메소드")
     @GetMapping("/room/{roomId}")
-    public ResponseEntity<?> enterRoom(@PathVariable String roomId, HttpServletRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        return new ResponseUtil<>().forSuccess(roomService.getRoomData(roomId,request));
+    public ResponseEntity<?> enterRoom(@PathVariable String roomId, HttpServletRequest request, @RequestBody RoomPasswordRequestDto password) throws OpenViduJavaClientException, OpenViduHttpException {
+        return new ResponseUtil<>().forSuccess(roomService.getRoomData(roomId,request,password));
     }
 
 
@@ -60,7 +64,7 @@ public class RoomController {
     // 방제 수정
     @ApiOperation(value = "방제 수정 메소드")
     @PutMapping("/room/{roomId}")
-    public ResponseEntity<?> renameRoom(@PathVariable String roomId, HttpServletRequest request, @RequestBody String roomTitle){
+    public ResponseEntity<?> renameRoom(@PathVariable String roomId, HttpServletRequest request, @RequestBody RoomTitleRenameDto roomTitle){
         return new ResponseUtil<>().forSuccess(roomService.renameRoom(roomId, request, roomTitle));
     }
 
@@ -68,7 +72,7 @@ public class RoomController {
     // 키워드로 방 검색
     @ApiOperation(value = "방 찾기 메소드")
     @GetMapping("/rooms/search/{page}")
-    public ResponseEntity<?> searchRoom(@PathVariable int page, @RequestBody String keyword){
+    public ResponseEntity<?> searchRoom(@PathVariable int page, @RequestBody RoomSearchRequestDto keyword){
         return new ResponseUtil<>().forSuccess(roomService.searchRoom(keyword,page));
     }
 
