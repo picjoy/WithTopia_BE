@@ -1,14 +1,18 @@
 package com.four.withtopia.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class MakeRoomRequestDto {
     private String roomTitle;   // 방제
     private Long maxMember;      // 방 인원 설정
     private boolean status;      // 방 상태(public / private)
+
+    @Size(min = 4, max = 4)
+    @Pattern(regexp = "^\\d*$")    // 숫자 4자리
+    private String password;    // 방이 private으로 설정될 시 패스워드 입력
 }

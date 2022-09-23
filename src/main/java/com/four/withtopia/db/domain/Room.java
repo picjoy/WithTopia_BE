@@ -32,6 +32,9 @@ public class Room extends Timestamped {
     @Column
     private boolean status;      // 방 상태(public / private)
 
+    @Column
+    private String password;    // private시 사용할 패스워드
+
     @OneToMany(mappedBy = "sessionId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomMember> roomMembers;
 
@@ -47,6 +50,8 @@ public class Room extends Timestamped {
     }
 
     public boolean validateMember(Member member) {
+        System.out.println(member.getNickName());
+        System.out.println(this.masterId);
         return !this.masterId.equals(member.getNickName());
     }
 

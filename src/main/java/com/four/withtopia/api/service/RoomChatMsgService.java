@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 public class RoomChatMsgService {
 
     // 주고받는 메세지
-    public RoomChatMsgDto createRoomChatMessage(Long roomId, ChatMessage chatMsgDto){
+    public RoomChatMsgDto createRoomChatMessage(String roomId, ChatMessage chatMsgDto){
 
         // 현재 시간 구하기
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM-dd HH:mm");

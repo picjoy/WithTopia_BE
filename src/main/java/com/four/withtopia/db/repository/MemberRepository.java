@@ -1,6 +1,7 @@
 package com.four.withtopia.db.repository;
 
 
+import com.four.withtopia.db.domain.Friend;
 import com.four.withtopia.db.domain.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,5 +32,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findTop3ByLikeCountGreaterThanOrderByLikeCountDescCreatedAtAsc(Long topMember);
 
     Member findByIsDelete(boolean member);
-
 }

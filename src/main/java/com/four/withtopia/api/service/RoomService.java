@@ -9,6 +9,9 @@ import com.four.withtopia.db.domain.RoomMember;
 import com.four.withtopia.db.repository.RoomMemberRepository;
 import com.four.withtopia.db.repository.RoomRepository;
 import com.four.withtopia.dto.request.MakeRoomRequestDto;
+import com.four.withtopia.dto.request.RoomPasswordRequestDto;
+import com.four.withtopia.dto.request.RoomSearchRequestDto;
+import com.four.withtopia.dto.request.RoomTitleRenameDto;
 import com.four.withtopia.dto.response.RoomCreateResponseDto;
 import com.four.withtopia.dto.response.RoomMemberResponseDto;
 import com.four.withtopia.util.MemberCheckUtils;
@@ -17,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -67,6 +70,7 @@ public class RoomService {
                 .masterId(member.getNickName())
                 .maxMember(makeRoomRequestDto.getMaxMember())
                 .status(makeRoomRequestDto.isStatus())
+                .password(makeRoomRequestDto.getPassword())
                 .build();
 
 
@@ -124,6 +128,7 @@ public class RoomService {
                 .roomMemberResponseDtoList(roomMemberResponseDtoList)
                 .status(savedRoom.isStatus())
                 .token(newToken.getToken())
+                .password(savedRoom.getPassword())
                 .build();
     }
 
@@ -131,60 +136,71 @@ public class RoomService {
     public Page<Room> getAllRooms(int page) {
         PageRequest pageable = PageRequest.of(page-1,6);
 
-        Page<Room> publicRooms = roomRepository.findByStatusOrderByModifiedAtDesc(pageable, true);
+        Page<Room> allRooms = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
 
-        return publicRooms;
+        return allRooms;
     }
 
     // 키워드로 채팅방 검색하기
-    public Page<Room> searchRoom(String keyword, int page) {
+    public Page<Room> searchRoom(RoomSearchRequestDto keyword, int page) {
         PageRequest pageable = PageRequest.of(page-1,6);
 
-        Page<Room> searchRoom = roomRepository.findByRoomTitleContaining(keyword, pageable);
+        Page<Room> searchRoom = roomRepository.findByRoomTitleContaining(keyword.getKeyword(), pageable);
 
         return searchRoom;
 
     }
 
     // 방장 방 나가기
-    public ResponseEntity<?> outRoom(String sessionId, HttpServletRequest request){
+    public String outRoom(String sessionId, HttpServletRequest request){
 
         //토큰 검증 및 멤버 객체 가져오기
         Member member = memberCheckUtils.checkMember(request);
 
         // 채팅방 찾기
         Room room = roomRepository.findById(sessionId).orElseThrow(
-                () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM));
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","해당 방이 없습니다.")));
 
         // 방장인 지 확인
         if (room.validateMember(member)){
-            throw new PrivateException(ErrorCode.MEMBER_NOT_AUTH_ERROR_ROOM);
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방장이 아닙니다."));
         }
         roomRepository.delete(room);
 
-        return ResponseEntity.ok(ErrorCode.OK);
+        return "Success";
     }
 
     // 방 접속
-    public RoomMemberResponseDto getRoomData(String SessionId, HttpServletRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+    public RoomMemberResponseDto getRoomData(String SessionId, HttpServletRequest request, RoomPasswordRequestDto password) throws OpenViduJavaClientException, OpenViduHttpException {
 
         //토큰 검증 및 멤버 객체 가져오기
         Member member = memberCheckUtils.checkMember(request);
 
         // 방이 있는 지 확인
         Room room = roomRepository.findById(SessionId).orElseThrow(
-                () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM));
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","해당 방이 없습니다.")));
 
         // 방 인원 초과 시
         if (room.getCntMember() > room.getMaxMember()){
-            throw new PrivateException(ErrorCode.ROOM_IS_FULL);
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 가득찼습니다."));
         }
 
         // 룸 멤버 있는 지 확인
         Optional<RoomMember> alreadyRoomMember = roomMemberRepository.findBySessionIdAndNickname(SessionId,member.getNickName());
         if (alreadyRoomMember.isPresent()){
-            throw new PrivateException(ErrorCode.ALREADY_IN_ROOM_MEMBER);
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 입장한 멤버입니다."));
         }
+
+        // 방에 비밀번호 있는 지 확인
+        if (!room.isStatus()){  // 방이 private인 지 확인
+            if (null == password.getPassword()){    // 패스워드를 입력 안했을 때 에러 발생
+                throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "비밀번호를 입력해주세요."));
+            }
+            if (!room.getPassword().equals(password.getPassword())){  // 비밀번호가 틀리면 에러 발생
+                throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400", "비밀번호가 틀립니다."));
+            }
+        }
+
 
         //채팅방 입장 시 토큰 발급
         String enterRoomToken = enterRoomCreateSession(member,room.getSessionId());
@@ -240,18 +256,19 @@ public class RoomService {
     }
 
     // 일반 멤버 나가기
-    public ResponseEntity<?> outRoomMember(String sessionId, HttpServletRequest request) {
+    public String outRoomMember(String sessionId, HttpServletRequest request) {
 
         //토큰 검증 및 멤버 객체 가져오기
         Member member = memberCheckUtils.checkMember(request);
 
         // 방이 있는 지 확인
         Room room = roomRepository.findById(sessionId).orElseThrow(
-                () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM));
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다."))
+        );
 
         // 룸 멤버 찾기
         RoomMember roomMember = roomMemberRepository.findBySessionIdAndNickname(sessionId,member.getNickName()).orElseThrow(
-                () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM_MEMBER)
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방에 있는 멤버가 아닙니다."))
         );
 
         // 룸 멤버 삭제
@@ -263,25 +280,25 @@ public class RoomService {
         // 룸 변경사항 저장
         roomRepository.save(room);
 
-        return ResponseEntity.ok(ErrorCode.OK);
+        return "Success";
     }
 
     // 방제 수정
-    public String renameRoom(String roomId, HttpServletRequest request, String roomTitle) {
+    public String renameRoom(String roomId, HttpServletRequest request, RoomTitleRenameDto roomTitle) {
 
         //토큰 검증 및 멤버 객체 가져오기
         Member member = memberCheckUtils.checkMember(request);
 
         // 채팅방 찾기
         Room room = roomRepository.findById(roomId).orElseThrow(
-                () -> new PrivateException(ErrorCode.NOT_FOUND_ROOM));
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다.")));
 
         // 방장인 지 확인
         if (room.validateMember(member)){
-            throw new PrivateException(ErrorCode.MEMBER_NOT_AUTH_ERROR_ROOM);
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다."));
         }
 
-        room.rename(roomTitle);
+        room.rename(roomTitle.getRoomTitle());
         roomRepository.save(room);
 
         // 방제 바꾸기
@@ -334,7 +351,7 @@ public class RoomService {
             }
         }
         if (session == null){
-            throw new PrivateException(ErrorCode.NOT_FOUND_ROOM);
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다."));
         }
 
         // 2. Openvidu에 유저 토큰 발급 요청 : 오픈비두 서버에 요청 유저가 타겟 채팅방에 입장할 수 있는 토큰을 발급 요청

@@ -2,6 +2,7 @@ package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.VoteService;
 import com.four.withtopia.dto.request.VoteRequestDto;
+import com.four.withtopia.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,6 @@ public class VoteController {
 
     @PostMapping("/vote")
     public ResponseEntity<?> vote(@RequestBody VoteRequestDto requestDto, HttpServletRequest request){
-        return voteService.vote(requestDto, request);
+        return new ResponseUtil<>().forSuccess(voteService.vote(requestDto, request));
     }
 }

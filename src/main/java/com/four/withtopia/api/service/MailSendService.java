@@ -1,13 +1,14 @@
 package com.four.withtopia.api.service;
 
-import com.four.withtopia.config.expection.PrivateResponseBody;
+import com.four.withtopia.config.error.ErrorCode;
+import com.four.withtopia.config.expection.PrivateException;
 import com.four.withtopia.db.domain.EmailAuth;
 import com.four.withtopia.db.repository.EmailAuthRepository;
 import com.four.withtopia.dto.request.EmailAuthRequestDto;
 import com.four.withtopia.util.MailUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class MailSendService {
 
-
+    private final RedisTemplate<String, Object> redisTemplate;
     private final JavaMailSenderImpl mailSender;
     private int size;
     private final EmailAuthRepository emailAuthRepository;
@@ -71,10 +72,10 @@ public class MailSendService {
 //        return authKey;
 //    }
 
-    public ResponseEntity<?> saveAuth(String email) throws MessagingException, UnsupportedEncodingException {
+    public String saveAuth(String email) throws MessagingException, UnsupportedEncodingException {
         String emailpatern = "^[a-zA-Z0-9]+@[a-zA-Z0-9-]+[a-zA-Z0-9-.]+$";
         if (!email.matches(emailpatern)){
-            return new ResponseEntity<>("이메일 양식이 아닙니다", HttpStatus.BAD_REQUEST);
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이메일 양식을 맞춰주세요"));
         }
         //임의의 authKey 생성 & 이메일 발송
         //6자리 난수 인증번호 생성
@@ -83,16 +84,16 @@ public class MailSendService {
         try {
             MailUtils sendMail = new MailUtils(mailSender);
             sendMail.setSubject("회원가입 이메일 인증");
-            sendMail.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
-                    .append("<p>아래 번호를 인증 창에 붙여넣어주세요.</p>")
+            sendMail.setText(new StringBuffer().append("<h1 style='text-align: center;'>[이메일 인증]</h1>")
+                    .append("<p style='text-align: center;'>아래 번호를 인증 창에 붙여넣어주세요.</p>")
                     .append("<br>")
-                    .append("<h1>").append(authKey).append("</h1>")
+                    .append("<h1 style='text-align: center;'>").append(authKey).append("</h1>")
                     .toString());
             sendMail.setFrom("WithTopia", "Admin");
             sendMail.setTo(email);
             sendMail.send();
         } catch (MessagingException | UnsupportedEncodingException e) {
-            return new ResponseEntity<>(new PrivateResponseBody(e), HttpStatus.BAD_REQUEST);
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","메일 발송에 실패했습니다."));
         }
         EmailAuth emailAuth = new EmailAuth(email,authKey);
         // authKey : email 정보 저장
@@ -103,10 +104,10 @@ public class MailSendService {
         } else {
             emailAuthRepository.save(emailAuth);
         }
-        return ResponseEntity.ok("success");
+        return "이메일 전송 완료";
     }
 
-    public ResponseEntity<?> checkAuthKey(EmailAuthRequestDto requestDto) {
+    public boolean checkAuthKey(EmailAuthRequestDto requestDto) {
         boolean confirm = false;
         EmailAuth origin = emailAuthRepository.findByEmail(requestDto.getEmail());
         if (!(origin == null)) {
@@ -114,6 +115,6 @@ public class MailSendService {
                 confirm = true;
             }
         }
-        return ResponseEntity.ok(confirm);
+        return confirm;
     }
 }

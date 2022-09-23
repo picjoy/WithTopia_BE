@@ -1,8 +1,11 @@
 package com.four.withtopia.config.security.jwt;
 
 
+import com.four.withtopia.config.error.ErrorCode;
+import com.four.withtopia.config.expection.PrivateException;
 import com.four.withtopia.config.security.Authority;
 import com.four.withtopia.config.security.UserDetailsImpl;
+import com.four.withtopia.config.security.UserDetailsServiceImpl;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.RefreshToken;
 import com.four.withtopia.db.repository.RefreshTokenRepository;
@@ -11,16 +14,23 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Key;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -36,10 +46,12 @@ public class TokenProvider {
     private final Key key;
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final UserDetailsServiceImpl userDetailsService;
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
-                         RefreshTokenRepository refreshTokenRepository) {
+                         RefreshTokenRepository refreshTokenRepository, UserDetailsServiceImpl userDetailsService) {
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userDetailsService = userDetailsService;
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -124,15 +136,38 @@ public class TokenProvider {
     }
 
     @Transactional
-    public ResponseEntity<?> deleteRefreshToken(Member member) {
+    public String deleteRefreshToken(Member member) {
         RefreshToken refreshToken = isPresentRefreshToken(member);
         if (null == refreshToken) {
-            return ResponseEntity.ok("TOKEN_NOT_FOUND, 존재하지 않는 Token 입니다.");
+            throw new PrivateException(new ErrorCode(HttpStatus.NOT_ACCEPTABLE,"400","로그인이 되어있지 않습니다."));
         }
 
         refreshTokenRepository.delete(refreshToken);
-        return ResponseEntity.ok("success");
+        return "로그아웃에 성공했습니다.";
     }
     // -------------------------------------------------------Reissue
 
+      public Authentication getAuthentication(String accessToken) {
+    Claims claims = parseClaims(accessToken);
+
+    if (claims.get(AUTHORITIES_KEY) == null) {
+      throw new RuntimeException("권한 정보가 없는 토큰 입니다.");
+    }
+
+    Collection<? extends GrantedAuthority> authorities =
+        Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
+            .map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList());
+
+    UserDetails principal = userDetailsService.loadUserByUsername(claims.getSubject());
+
+    return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+  }
+      private Claims parseClaims(String accessToken) {
+    try {
+      return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+    } catch (ExpiredJwtException e) {
+      return e.getClaims();
+    }
+  }
 }

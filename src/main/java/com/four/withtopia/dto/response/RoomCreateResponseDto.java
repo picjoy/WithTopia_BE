@@ -16,4 +16,5 @@ public class RoomCreateResponseDto {
     private List<RoomMemberResponseDto> roomMemberResponseDtoList;  // 멤버 리스트
     private boolean status;
     private String token;
+    private String password;
 }
