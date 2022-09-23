@@ -5,6 +5,7 @@ import com.four.withtopia.config.error.ErrorCode;
 import com.four.withtopia.config.expection.PrivateException;
 import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
+import com.four.withtopia.db.domain.ProfileImage;
 import com.four.withtopia.db.domain.RefreshToken;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.ProfileImageRepository;
@@ -25,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -144,15 +144,15 @@ public class MemberService {
         if (!(validationUtil.passwordCheck(requestDto))) {
            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","패스워드가 일치하지않습니다."));
         }
-//    List<ProfileImage> images = profileImageRepository.findAll();
-        int randomInt = new Random().nextInt(3);
+        List<ProfileImage> images = profileImageRepository.findAll();
+        int randomInt = new Random().nextInt(images.size());
 
-//    Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()),profileImageRepository.getReferenceById(randomInt).getProfileIamge());
-        List<String> img = new ArrayList<>();
-        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/original.jpeg");
-        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/winter.png");
-        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/cat.png");
-        Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()), img.get(randomInt));
+//        Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()),profileImageRepository.getReferenceById((long) randomInt).getProfileIamge());
+//        List<String> img = new ArrayList<>();
+//        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/original.jpeg");
+//        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/winter.png");
+//        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/cat.png");
+        Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()), images.get(randomInt).getProfileIamge());
 
         memberRepository.save(member);
         return "success";
