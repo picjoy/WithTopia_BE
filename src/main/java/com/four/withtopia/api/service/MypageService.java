@@ -1,21 +1,32 @@
 package com.four.withtopia.api.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.util.IOUtils;
 import com.four.withtopia.config.error.ErrorCode;
 import com.four.withtopia.config.expection.PrivateException;
 import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
+import com.four.withtopia.db.domain.ProfileImage;
 import com.four.withtopia.db.repository.MemberRepository;
+import com.four.withtopia.db.repository.ProfileImageRepository;
 import com.four.withtopia.dto.request.ChangePasswordRequestDto;
 import com.four.withtopia.dto.request.ProfileUpdateRequestDto;
 import com.four.withtopia.dto.response.MypageResponseDto;
 import com.four.withtopia.util.MemberCheckUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,6 +38,13 @@ public class MypageService {
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final MemberCheckUtils memberCheckUtils;
+
+    private final AmazonS3Client amazonS3Client;
+
+    private final ProfileImageRepository profileImageRepository;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
 
     @Transactional(readOnly = true)
     public MypageResponseDto getMypage(HttpServletRequest request){
@@ -94,5 +112,27 @@ public class MypageService {
         };
 
         finalDelete.schedule(deleteTask, lateTime);
+    }
+
+    public String insertImage(MultipartFile multipartFile) throws IOException {
+        if (multipartFile == null | multipartFile.isEmpty()){
+            throw new PrivateException(new ErrorCode(HttpStatus.NOT_FOUND,"400","이미지 파일이 없습니다"));
+        }
+        String fileName = multipartFile.getOriginalFilename();
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType(multipartFile.getContentType());
+
+        byte[] bytes = IOUtils.toByteArray(multipartFile.getInputStream());
+        objectMetadata.setContentLength(bytes.length);
+        ByteArrayInputStream byteArrayIs = new ByteArrayInputStream(bytes);
+
+        amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, byteArrayIs, objectMetadata)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+        String imgurl = amazonS3Client.getUrl(bucketName, fileName).toString();
+
+        ProfileImage profileImage = new ProfileImage(imgurl);
+
+        profileImageRepository.save(profileImage);
+        return "이미지 업로드 성공";
     }
 }

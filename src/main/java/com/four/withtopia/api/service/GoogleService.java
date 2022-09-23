@@ -8,7 +8,6 @@ import com.four.withtopia.db.domain.ProfileImage;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.ProfileImageRepository;
 import com.four.withtopia.dto.request.GoogleUserInfoDto;
-import com.four.withtopia.dto.request.KakaoUserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -21,7 +20,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -108,15 +108,14 @@ public class GoogleService {
         // 유저네임에 랜덤한 id 붙여주기
         String usernameId = UUID.randomUUID().toString();
         // 유저 이미지를 랜덤하게 부여하기
-        Long randomImgId = (long)(Math.random() * 8);
-        System.out.println("randomImgId = " + randomImgId);
-        Optional<ProfileImage> randomImg = profileImageRepository.findById(randomImgId);
+        List<ProfileImage> images = profileImageRepository.findAll();
+        int randomInt = new Random().nextInt(images.size());
 
         return Member.builder()
                 .kakaoId(googleUserInfo.getGoogleId())
                 .nickName(googleUserInfo.getNickName() + "_google_" + usernameId)
                 .email(googleUserInfo.getEmail())
-                .profileImage("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/e3f569cf-b23a-4462-a0e1-9caa51e36aca")
+                .profileImage(images.get(randomInt).getProfileIamge())
                 .build();
     }
 }

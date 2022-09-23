@@ -1,7 +1,6 @@
 package com.four.withtopia.config.error;
 
 import com.four.withtopia.config.expection.PrivateException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,13 +31,13 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler({PrivateException.class})
     public ResponseEntity<?> handleException(PrivateException ex){
-        return ResponseEntity.badRequest().header("Content-Type","application/json; charset=UTF-8").body(ex.getErrorCode());
+        return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).header("Content-Type","application/json; charset=UTF-8").body(ex.getErrorCode());
     }
 
 //    NullPointerException 예외처리
     @ExceptionHandler({NullPointerException.class})
     public ResponseEntity<?> handleException(NullPointerException ex){
-        return ResponseEntity.status(404).header("Content-Type","application/json; charset=UTF-8").body(new ErrorCode(HttpStatus.NOT_FOUND,"404","NullPointException"));
+        return ResponseEntity.status(404).header("Content-Type","application/json; charset=UTF-8").body(ex);
     }
 }
 

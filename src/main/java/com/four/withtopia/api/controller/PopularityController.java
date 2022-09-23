@@ -1,6 +1,7 @@
 package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.PopularityService;
+import com.four.withtopia.config.expection.PrivateResponseBody;
 import com.four.withtopia.util.ResponseUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +19,14 @@ public class PopularityController {
     // 인기 상위 멤버
     @ApiOperation(value = "인기 상위 멤버 3명 조회")
     @GetMapping("/top")
-    public ResponseEntity<?> topMember(){
+    public ResponseEntity<PrivateResponseBody> topMember(){
         return new ResponseUtil<>().forSuccess(popularityService.topMember());
     }
 
     // 전체 멤버 랭킹
     @ApiOperation(value = "전체 멤버 랭킹 조회")
     @GetMapping("/rank/{page}")
-    public ResponseEntity<?> totalMemberRank(@PathVariable int page){
+    public ResponseEntity<PrivateResponseBody> totalMemberRank(@PathVariable int page){
         return new ResponseUtil<>().forSuccess(popularityService.totalMemberRank(page));
     }
 }
