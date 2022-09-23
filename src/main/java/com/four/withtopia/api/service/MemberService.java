@@ -128,6 +128,7 @@ public class MemberService {
   }
 
     public String createMember(MemberRequestDto requestDto) {
+        String pattern = "[a-zA-Z!@#$%^&*]*${8,20}";
         if (validationUtil.emailExist(requestDto.getEmail())) {
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 존재하는 이메일 입니다."));
         }

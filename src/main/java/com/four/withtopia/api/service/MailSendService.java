@@ -4,6 +4,7 @@ import com.four.withtopia.config.error.ErrorCode;
 import com.four.withtopia.config.expection.PrivateException;
 import com.four.withtopia.db.domain.EmailAuth;
 import com.four.withtopia.db.repository.EmailAuthRepository;
+import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.request.EmailAuthRequestDto;
 import com.four.withtopia.util.MailUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class MailSendService {
     private final JavaMailSenderImpl mailSender;
     private int size;
     private final EmailAuthRepository emailAuthRepository;
+    private final MemberRepository memberRepository;
 
 
 
@@ -74,6 +76,9 @@ public class MailSendService {
 
     public String saveAuth(String email) throws MessagingException, UnsupportedEncodingException {
         String emailpatern = "^[a-zA-Z0-9]+@[a-zA-Z0-9-]+[a-zA-Z0-9-.]+$";
+        if (memberRepository.existsByEmail(email)){
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 존재하는 이메일입니다."));
+        }
         if (!email.matches(emailpatern)){
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이메일 양식을 맞춰주세요"));
         }
@@ -84,10 +89,14 @@ public class MailSendService {
         try {
             MailUtils sendMail = new MailUtils(mailSender);
             sendMail.setSubject("회원가입 이메일 인증");
-            sendMail.setText(new StringBuffer().append("<h1 style='text-align: center;'>[이메일 인증]</h1>")
-                    .append("<p style='text-align: center;'>아래 번호를 인증 창에 붙여넣어주세요.</p>")
+            sendMail.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
+                    .append("<img src='https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/Group+312.png' ")
                     .append("<br>")
-                    .append("<h1 style='text-align: center;'>").append(authKey).append("</h1>")
+                    .append("<p>인증 번호는 10분 뒤에 만료됩니다.</p>")
+                    .append("<p>아래 번호를 인증 창에 붙여넣어주세요.</p>")
+                    .append("<h1>-인증 번호-</h1>")
+                    .append("<h3>").append(authKey).append("</h3>")
+                    .append("<p>*인증번호 유효시간이 지난 경우 재발급해서 사용해주세요.</p>")
                     .toString());
             sendMail.setFrom("WithTopia", "Admin");
             sendMail.setTo(email);
@@ -104,7 +113,7 @@ public class MailSendService {
         } else {
             emailAuthRepository.save(emailAuth);
         }
-        return "이메일 전송 완료";
+        return "인증번호 전송 완료! 이메일을 확인해주세요.";
     }
 
     public boolean checkAuthKey(EmailAuthRequestDto requestDto) {

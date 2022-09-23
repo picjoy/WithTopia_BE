@@ -1,6 +1,7 @@
 package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.VoteService;
+import com.four.withtopia.config.expection.PrivateResponseBody;
 import com.four.withtopia.dto.request.VoteRequestDto;
 import com.four.withtopia.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class VoteController {
     private final VoteService voteService;
 
     @PostMapping("/vote")
-    public ResponseEntity<?> vote(@RequestBody VoteRequestDto requestDto, HttpServletRequest request){
+    public ResponseEntity<PrivateResponseBody> vote(@RequestBody VoteRequestDto requestDto, HttpServletRequest request){
         return new ResponseUtil<>().forSuccess(voteService.vote(requestDto, request));
     }
 }

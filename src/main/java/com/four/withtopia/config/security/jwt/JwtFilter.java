@@ -58,11 +58,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
 //        Session 의 토큰 값 가져오기
         String jwt = resolveToken(request);
-
-
-        System.out.println("----------------------토큰값-----------");
-        System.out.println(jwt);
-
+        System.out.println("---------------------------------------");
+        System.out.println("UsingMethod : "+request.getMethod());
+        System.out.println("UsingURL : "+request.getRequestURL());
+        System.out.println("AccessToken : "+jwt);
+        System.out.println("UsingIP : "+request.getLocalAddr());
+        System.out.println(request.getProtocol());
+        System.out.println("---------------------------------------");
 
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         //바이트배열을 생성한 다음 키를 생성
@@ -79,6 +81,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             System.out.println("----------------Claims-------------------");
             System.out.println(claims);
+            System.out.println("-----------------------------------------");
             if (claims.getExpiration().toInstant().toEpochMilli() < Instant.now().toEpochMilli()) {
                 response.setContentType("application/json;charset=UTF-8");
                 response.getWriter().println(

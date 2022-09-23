@@ -18,4 +18,8 @@ public class ProfileImage {
 
     @Column(nullable = false)
     private String profileIamge;
+
+    public ProfileImage(String profileIamge) {
+        this.profileIamge = profileIamge;
+    }
 }

@@ -1,6 +1,7 @@
 package com.four.withtopia.api.controller;
 
 import com.four.withtopia.api.service.MailSendService;
+import com.four.withtopia.config.expection.PrivateResponseBody;
 import com.four.withtopia.dto.request.EmailAuthRequestDto;
 import com.four.withtopia.dto.request.EmailRequestDto;
 import com.four.withtopia.util.ResponseUtil;
@@ -25,7 +26,7 @@ public class EmailController {
     // 이메일 인증 신청
     @ApiOperation(value = "이메일 인증 신청")
     @RequestMapping(value = "/member/email/request", method = RequestMethod.POST)
-    public ResponseEntity<?> emailRequest(@RequestBody EmailRequestDto email) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<PrivateResponseBody> emailRequest(@RequestBody EmailRequestDto email) throws MessagingException, UnsupportedEncodingException {
         //DB에 authKey 업데이트
         return new ResponseUtil<>().forSuccess(mss.saveAuth(email.getEmail()));
     }
@@ -33,7 +34,7 @@ public class EmailController {
     //    이메일 인증 번호 비교
     @ApiOperation(value = "이메일 인증")
     @RequestMapping(value = "/member/email/confirm", method = RequestMethod.POST)
-    public ResponseEntity<?> emailConfirm(@RequestBody EmailAuthRequestDto requestDto) {
+    public ResponseEntity<PrivateResponseBody> emailConfirm(@RequestBody EmailAuthRequestDto requestDto) {
         return new ResponseUtil<>().forSuccess(mss.checkAuthKey(requestDto));
     }
 }
