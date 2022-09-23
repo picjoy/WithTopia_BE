@@ -181,7 +181,7 @@ public class RoomService {
                 () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","해당 방이 없습니다.")));
 
         // 방 인원 초과 시
-        if (room.getCntMember() > room.getMaxMember()){
+        if (room.getCntMember() >= room.getMaxMember()){
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 가득찼습니다."));
         }
 

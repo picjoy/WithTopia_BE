@@ -41,7 +41,7 @@ public class RoomController {
 
     // 방 접속
     @ApiOperation(value = "일반 멤버 방 접속 메소드")
-    @GetMapping("/room/{roomId}")
+    @PostMapping("/room/{roomId}")
     public ResponseEntity<?> enterRoom(@PathVariable String roomId, HttpServletRequest request, @RequestBody RoomPasswordRequestDto password) throws OpenViduJavaClientException, OpenViduHttpException {
         return new ResponseUtil<>().forSuccess(roomService.getRoomData(roomId,request,password));
     }
