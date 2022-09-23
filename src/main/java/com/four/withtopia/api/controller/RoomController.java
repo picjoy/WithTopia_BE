@@ -77,9 +77,4 @@ public class RoomController {
         return new ResponseUtil<>().forSuccess(roomService.searchRoom(keyword,page));
     }
 
-
-
-
-
-
 }
