@@ -11,7 +11,7 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     void delete(Room room);
 
 
-    Page<Room> findByStatusOrderByModifiedAtDesc(Pageable pageable, boolean status);
+    Page<Room> findAllByOrderByModifiedAtAsc(Pageable pageable);
 
 
 
