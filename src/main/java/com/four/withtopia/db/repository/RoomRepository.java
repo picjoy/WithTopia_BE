@@ -17,5 +17,5 @@ public interface RoomRepository extends JpaRepository<Room, String> {
 
     // Containing을 붙여주면 Like 검색이 가능
     // %{keyword}%가 가능
-    Page<Room> findByRoomTitleContaining(String keyword, Pageable pageable);
+    Page<Room> findByRoomTitleContainingOrderByModifiedAtAsc(String keyword, Pageable pageable);
 }

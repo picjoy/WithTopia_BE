@@ -10,7 +10,6 @@ import com.four.withtopia.db.repository.RoomMemberRepository;
 import com.four.withtopia.db.repository.RoomRepository;
 import com.four.withtopia.dto.request.MakeRoomRequestDto;
 import com.four.withtopia.dto.request.RoomPasswordRequestDto;
-import com.four.withtopia.dto.request.RoomSearchRequestDto;
 import com.four.withtopia.dto.request.RoomTitleRenameDto;
 import com.four.withtopia.dto.response.RoomCreateResponseDto;
 import com.four.withtopia.dto.response.RoomMemberResponseDto;
@@ -142,10 +141,10 @@ public class RoomService {
     }
 
     // 키워드로 채팅방 검색하기
-    public Page<Room> searchRoom(RoomSearchRequestDto keyword, int page) {
+    public Page<Room> searchRoom(String keyword, int page) {
         PageRequest pageable = PageRequest.of(page-1,6);
 
-        Page<Room> searchRoom = roomRepository.findByRoomTitleContaining(keyword.getKeyword(), pageable);
+        Page<Room> searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
 
         return searchRoom;
 
