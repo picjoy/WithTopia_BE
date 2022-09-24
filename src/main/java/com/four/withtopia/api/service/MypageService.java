@@ -15,6 +15,7 @@ import com.four.withtopia.db.repository.ProfileImageRepository;
 import com.four.withtopia.dto.request.ChangePasswordRequestDto;
 import com.four.withtopia.dto.request.ProfileUpdateRequestDto;
 import com.four.withtopia.dto.response.MypageResponseDto;
+import com.four.withtopia.dto.response.ProfileImageListResponseDto;
 import com.four.withtopia.util.MemberCheckUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +35,7 @@ public class MypageService {
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final MemberCheckUtils memberCheckUtils;
+    private final ProfileImageRepository profileImageRepository;
 
     private final AmazonS3Client amazonS3Client;
 
@@ -93,6 +91,22 @@ public class MypageService {
         member.updatePw(password);
         memberRepository.save(member);
         return "success";
+    }
+
+    // 프로필 이미지 전체 보내기
+    @Transactional
+    public List<ProfileImageListResponseDto> getProfileImage(){
+        List<ProfileImage> imageList = profileImageRepository.findAll();
+        List<ProfileImageListResponseDto> responseDtoList = new ArrayList<>();
+
+        for (ProfileImage image: imageList) {
+            ProfileImageListResponseDto responseDto = ProfileImageListResponseDto.builder()
+                    .imageUrl(image.getProfileIamge())
+                    .build();
+            responseDtoList.add(responseDto);
+        }
+
+        return responseDtoList;
     }
 
     // 회원이 탈퇴한 후 3일이 지나면 회원 내역 삭제
