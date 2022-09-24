@@ -63,7 +63,8 @@ public class RoomService {
         String Pattern =  "^[a-zA-Z\\d!@#$%^&*]{4,12}$";
         System.out.println(makeRoomRequestDto.getPassword().matches(Pattern));
 
-        if(!makeRoomRequestDto.getPassword().matches(Pattern)){
+
+        if(!makeRoomRequestDto.isStatus()&&!makeRoomRequestDto.getPassword().matches(Pattern)){
             throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","비밀번호 양식이 맞지않습니다."));
         }
 
