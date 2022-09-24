@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class ResponseUtil<T> {
 
 
-    public ResponseEntity<?> forSuccess(T data){
+    public ResponseEntity<PrivateResponseBody> forSuccess(T data){
         return new ResponseEntity<>(
                 new PrivateResponseBody(
                         new ErrorCode(HttpStatus.OK, "200", "정상") , data

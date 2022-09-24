@@ -27,7 +27,7 @@ public class EmailAuth {
     public EmailAuth(String email, String authKey) {
         this.email = email;
         this.Auth = authKey;
-        this.expiration = 60;
+        this.expiration = 600;
     }
 
     public void Update(String auth){

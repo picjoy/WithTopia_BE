@@ -31,13 +31,13 @@ public class VoteService {
 
         // 자신에게 투표하지 못하게 막기
         if(voteByMember.getNickName().equals(requestDto.getNickname())){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","자신에게 투표할 수 없습니다."));
+            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","자신에게 투표할 수 없습니다."));
         }
 
         // 이 멤버가 투표를 했는가? 만일 했다면 에러코드 발생
         Vote checkVote = voteRepository.findByVoteByAndVoteTo(voteByMember.getNickName(), requestDto.getNickname());
         if(checkVote != null){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 투표를 완료했습니다."));
+            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","이미 투표를 완료했습니다."));
         }
 
         // 이 멤버가 투표를 안 했다면?
