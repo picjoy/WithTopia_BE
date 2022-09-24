@@ -24,7 +24,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
@@ -56,6 +59,13 @@ public class RoomService {
 
         //토큰 검증 및 멤버 객체 가져오기
         Member member = memberCheckUtils.checkMember(request);
+
+        String Pattern =  "^[a-zA-Z\\d!@#$%^&*]{4,12}$";
+        System.out.println(makeRoomRequestDto.getPassword().matches(Pattern));
+
+        if(!makeRoomRequestDto.getPassword().matches(Pattern)){
+            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","비밀번호 양식이 맞지않습니다."));
+        }
 
         // 새로운 채팅방 생성
         RoomCreateResponseDto newToken = createNewToken(member);
