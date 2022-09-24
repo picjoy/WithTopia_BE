@@ -156,6 +156,11 @@ public class RoomService {
 
         Page<Room> searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
 
+        // 검색 결과가 없다면
+        if (searchRoom.isEmpty()){
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","검색 결과가 없습니다."));
+        }
+
         return searchRoom;
 
     }
