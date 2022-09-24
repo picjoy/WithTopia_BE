@@ -5,7 +5,6 @@ import com.four.withtopia.api.service.RoomService;
 import com.four.withtopia.config.expection.PrivateResponseBody;
 import com.four.withtopia.dto.request.MakeRoomRequestDto;
 import com.four.withtopia.dto.request.RoomPasswordRequestDto;
-import com.four.withtopia.dto.request.RoomSearchRequestDto;
 import com.four.withtopia.dto.request.RoomTitleRenameDto;
 import com.four.withtopia.util.ResponseUtil;
 import io.openvidu.java.client.OpenViduHttpException;
@@ -73,7 +72,7 @@ public class RoomController {
     // 키워드로 방 검색
     @ApiOperation(value = "방 찾기 메소드")
     @GetMapping("/rooms/search/{page}")
-    public ResponseEntity<PrivateResponseBody> searchRoom(@PathVariable int page, @RequestBody RoomSearchRequestDto keyword){
+    public ResponseEntity<?> searchRoom(@PathVariable int page, @RequestParam String keyword){
         return new ResponseUtil<>().forSuccess(roomService.searchRoom(keyword,page));
     }
 
