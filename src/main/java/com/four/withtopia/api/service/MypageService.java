@@ -26,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -36,10 +38,7 @@ public class MypageService {
     private final TokenProvider tokenProvider;
     private final MemberCheckUtils memberCheckUtils;
     private final ProfileImageRepository profileImageRepository;
-
     private final AmazonS3Client amazonS3Client;
-
-    private final ProfileImageRepository profileImageRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
@@ -101,6 +100,7 @@ public class MypageService {
 
         for (ProfileImage image: imageList) {
             ProfileImageListResponseDto responseDto = ProfileImageListResponseDto.builder()
+                    .imageId(image.getImageId())
                     .imageUrl(image.getProfileIamge())
                     .build();
             responseDtoList.add(responseDto);

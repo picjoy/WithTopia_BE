@@ -8,5 +8,6 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class ProfileImageListResponseDto {
+    private Long imageId;
     private String imageUrl;
 }
