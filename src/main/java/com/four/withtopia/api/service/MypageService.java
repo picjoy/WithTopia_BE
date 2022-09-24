@@ -4,10 +4,13 @@ import com.four.withtopia.config.error.ErrorCode;
 import com.four.withtopia.config.expection.PrivateException;
 import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
+import com.four.withtopia.db.domain.ProfileImage;
 import com.four.withtopia.db.repository.MemberRepository;
+import com.four.withtopia.db.repository.ProfileImageRepository;
 import com.four.withtopia.dto.request.ChangePasswordRequestDto;
 import com.four.withtopia.dto.request.ProfileUpdateRequestDto;
 import com.four.withtopia.dto.response.MypageResponseDto;
+import com.four.withtopia.dto.response.ProfileImageListResponseDto;
 import com.four.withtopia.util.MemberCheckUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class MypageService {
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final MemberCheckUtils memberCheckUtils;
+    private final ProfileImageRepository profileImageRepository;
 
     @Transactional(readOnly = true)
     public MypageResponseDto getMypage(HttpServletRequest request){
@@ -75,6 +77,22 @@ public class MypageService {
         member.updatePw(password);
         memberRepository.save(member);
         return "success";
+    }
+
+    // 프로필 이미지 전체 보내기
+    @Transactional
+    public List<ProfileImageListResponseDto> getProfileImage(){
+        List<ProfileImage> imageList = profileImageRepository.findAll();
+        List<ProfileImageListResponseDto> responseDtoList = new ArrayList<>();
+
+        for (ProfileImage image: imageList) {
+            ProfileImageListResponseDto responseDto = ProfileImageListResponseDto.builder()
+                    .imageUrl(image.getProfileIamge())
+                    .build();
+            responseDtoList.add(responseDto);
+        }
+
+        return responseDtoList;
     }
 
     // 회원이 탈퇴한 후 3일이 지나면 회원 내역 삭제

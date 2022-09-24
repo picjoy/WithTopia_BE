@@ -1,5 +1,6 @@
 package com.four.withtopia.db.domain;
 
+import com.four.withtopia.dto.response.ProfileImageListResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,4 +19,8 @@ public class ProfileImage {
 
     @Column(nullable = false)
     private String profileIamge;
+
+    public ProfileImage(String profileIamge){
+        this.profileIamge = profileIamge;
+    }
 }

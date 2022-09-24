@@ -39,4 +39,9 @@ public class MypageController {
         return new ResponseUtil<>().forSuccess(mypageService.changePassword(requestDto));
     }
 
+    @RequestMapping(value = "/mypage/image", method = RequestMethod.GET)
+    public ResponseEntity<?> getProfileImage(){
+        return new ResponseUtil<>().forSuccess(mypageService.getProfileImage());
+    }
+
 }
