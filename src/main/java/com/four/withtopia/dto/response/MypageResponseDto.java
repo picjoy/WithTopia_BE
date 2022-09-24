@@ -15,6 +15,7 @@ public class MypageResponseDto {
     private String nickName;
     private String email;
     private String profileImage;
+    private long lickCnt;
 
     public static MypageResponseDto createMypageResponseDto(Member member){
         return MypageResponseDto.builder()
@@ -22,6 +23,7 @@ public class MypageResponseDto {
                 .nickName(member.getNickName())
                 .email(member.getEmail())
                 .profileImage(member.getProfileImage())
+                .lickCnt(member.getLikeCount())
                 .build();
     }
 }

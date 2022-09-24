@@ -43,4 +43,9 @@ public class MypageController {
         return new ResponseUtil<>().forSuccess(mypageService.insertImage(multipartFile));
     }
 
+    @RequestMapping(value = "/mypage/image", method = RequestMethod.GET)
+    public ResponseEntity<?> getProfileImage(){
+        return new ResponseUtil<>().forSuccess(mypageService.getProfileImage());
+    }
+
 }
