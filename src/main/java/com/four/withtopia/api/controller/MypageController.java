@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RestController
@@ -25,8 +26,8 @@ public class MypageController {
     }
 
     @RequestMapping(value = "/member/mypage", method = RequestMethod.PUT)
-    public ResponseEntity<PrivateResponseBody> updateMemberInfo(@RequestBody ProfileUpdateRequestDto requestDto, HttpServletRequest request){
-        return new ResponseUtil<>().forSuccess(mypageService.updateMemberInfo(requestDto, request));
+    public ResponseEntity<PrivateResponseBody> updateMemberInfo(@RequestBody ProfileUpdateRequestDto requestDto, HttpServletRequest request, HttpServletResponse response){
+        return new ResponseUtil<>().forSuccess(mypageService.updateMemberInfo(requestDto, request, response));
     }
 
     @RequestMapping(value = "/member/leave", method = RequestMethod.PUT)

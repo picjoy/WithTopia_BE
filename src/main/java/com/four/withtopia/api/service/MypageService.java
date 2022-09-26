@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
@@ -52,13 +53,26 @@ public class MypageService {
     }
 
     @Transactional
-    public MypageResponseDto updateMemberInfo(ProfileUpdateRequestDto requestDto, HttpServletRequest request){
+    public MypageResponseDto updateMemberInfo(ProfileUpdateRequestDto requestDto, HttpServletRequest request, HttpServletResponse response){
         // 토큰 검사
         Member member = memberCheckUtils.checkMember(request);
+
+        String Pattern =  "^[a-zA-Z\\d]{2,12}$";
+
+        if(!requestDto.getNickName().matches(Pattern)){
+            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","닉네임 양식에 맞지 않습니다."));
+        }
 
         member.updateMember(requestDto, member);
         memberRepository.save(member);
         MypageResponseDto responseDto = MypageResponseDto.createMypageResponseDto(member);
+
+        // 토큰 재발급
+        String accessToken = tokenProvider.GenerateAccessToken(member);
+        String refreshToken = tokenProvider.GenerateRefreshToken(member);
+
+        response.addHeader("Authorization", "Bearer " + accessToken);
+        response.addHeader("RefreshToken", refreshToken);
 
         return responseDto;
     }
