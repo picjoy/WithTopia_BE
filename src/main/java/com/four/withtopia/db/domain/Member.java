@@ -49,7 +49,7 @@ public class Member extends Timestamped {
     private long likeCount = 0;
 
     // 친구 리스트
-    @OneToMany(mappedBy = "myNickname", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "myNickname", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Friend> friends;
 
     @Builder

@@ -18,7 +18,6 @@ import com.four.withtopia.util.MemberCheckUtils;
 import com.four.withtopia.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -184,23 +183,22 @@ public class MemberService {
   @Transactional
   public Member reissue(HttpServletRequest request, HttpServletResponse response) {
     if (!tokenProvider.validateToken(request.getHeader("RefreshToken"))) {
-      throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","유효하지않은 토큰입니다."));
+      throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","유효하지않은 토큰입니다.1"));
     }
     Member member = tokenProvider.getMemberFromAuthentication();
     if (null == member) {
-      throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","유효하지않은 토큰입니다."));
+      throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","유효하지않은 토큰입니다.2"));
     }
-
-    Authentication authentication = tokenProvider.getAuthentication(request.getHeader("authorization"));
     RefreshToken refreshToken = tokenProvider.isPresentRefreshToken(member);
-
+    System.out.println("refreshment");
+    System.out.println(refreshToken.getValue());
+    System.out.println(request.getHeader("RefreshToken"));
+    System.out.println(!refreshToken.getValue().equals(request.getHeader("RefreshToken")));
     if (!refreshToken.getValue().equals(request.getHeader("RefreshToken"))) {
-      throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","유효하지않은 토큰입니다."));
+      throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","유효하지않은 토큰입니다.3"));
     }
-    String AccessToken = tokenProvider.GenerateRefreshToken(member);
-    String RefreshToken = tokenProvider.GenerateRefreshToken(member);
+    String AccessToken = tokenProvider.GenerateAccessToken(member);
     response.addHeader("Authorization", "Bearer " + AccessToken);
-    response.addHeader("RefreshToken",RefreshToken);
     return member;
   }
 
