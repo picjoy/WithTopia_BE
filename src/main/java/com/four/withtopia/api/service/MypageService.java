@@ -56,7 +56,7 @@ public class MypageService {
         // 토큰 검사
         Member member = memberCheckUtils.checkMember(request);
 
-        member.updateMember(requestDto);
+        member.updateMember(requestDto, member);
         memberRepository.save(member);
         MypageResponseDto responseDto = MypageResponseDto.createMypageResponseDto(member);
 
