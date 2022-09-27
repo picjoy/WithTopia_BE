@@ -7,6 +7,7 @@ import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.ProfileImage;
 import com.four.withtopia.db.domain.RefreshToken;
+import com.four.withtopia.db.domain.Report;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.ProfileImageRepository;
 import com.four.withtopia.dto.request.GoogleUserInfoDto;
@@ -25,9 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -203,6 +202,36 @@ public class MemberService {
     String AccessToken = tokenProvider.GenerateAccessToken(member);
     response.addHeader("Authorization", "Bearer " + AccessToken);
     return member;
+  }
+
+  // 계정 정지
+  public void memberSuspend(Long memberId){
+    Optional<Member> member = memberRepository.findByMemberId(memberId);
+    member.get().updateSuspend(true);
+    memberRepository.save(member.get());
+    System.out.println("member.get().isSuspend() = " + member.get().isSuspend());
+    reportResult();
+  }
+
+  @Transactional
+  public void reportResult(){
+    // 3일 간 정지
+    long suspendTime = 1000 * 60 * 60 * 24 * 3;
+
+    Timer suspend = new Timer();
+    TimerTask suspendTask = new TimerTask() {
+      @Override
+      public void run() {
+        // 멤버 지우기
+        Member suspendMember = memberRepository.findBySuspend(true);
+        suspendMember.updateSuspend(false);
+        memberRepository.save(suspendMember);
+        System.out.println("suspendMember.getSuspend() = " + suspendMember.isSuspend());
+        suspend.cancel();
+      }
+    };
+
+    suspend.schedule(suspendTask, suspendTime);
   }
 
 }

@@ -121,4 +121,7 @@ public class Member extends Timestamped {
     public void updatePopularity(Long likCnt){
         this.likeCount = likCnt;
     }
+    public void updateSuspend(boolean suspend){
+        this.suspend = suspend;
+    }
 }
