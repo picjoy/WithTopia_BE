@@ -49,14 +49,14 @@ public class MemberController {
 
   @ApiOperation(value = "카카오 로그인")
   @RequestMapping(value = "/member/login/kakao", method = RequestMethod.GET)
-  public ResponseEntity<PrivateResponseBody> kakaoLogin(@RequestParam(value="code") String code, HttpSession session) throws JsonProcessingException {
-    return new ResponseUtil<>().forSuccess(memberService.kakaoLogin(code, session));
+  public ResponseEntity<PrivateResponseBody> kakaoLogin(@RequestParam(value="code") String code, HttpServletResponse response) throws JsonProcessingException {
+    return new ResponseUtil<>().forSuccess(memberService.kakaoLogin(code, response));
   }
 
   @ApiOperation(value = "구글 로그인")
   @RequestMapping(value = "/member/login/google", method = RequestMethod.GET)
-  public ResponseEntity<PrivateResponseBody> googleLogin(@RequestParam(value="code") String code, HttpSession session) throws JsonProcessingException {
-    return new ResponseUtil<>().forSuccess(memberService.googleLogin(code, session));
+  public ResponseEntity<PrivateResponseBody> googleLogin(@RequestParam(value="code") String code, HttpServletResponse response) throws JsonProcessingException {
+    return new ResponseUtil<>().forSuccess(memberService.googleLogin(code, response));
   }
 
   @ApiOperation(value = "유저 패스워드 변경")
