@@ -37,8 +37,42 @@ dependencies {
 //     validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.2'
+
+//     oauth2
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+//    mailing
+    implementation group: 'javax.mail', name: 'mail', version: '1.4.7'
+    implementation group: 'org.springframework', name: 'spring-context-support', version: '5.3.18'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+//    openvidu
+    implementation group: 'io.openvidu', name: 'openvidu-java-client', version: '2.22.0'
+    implementation group: 'junit', name: 'junit', version: '4.13.1'
+    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+//    Cookies
+//    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.10.RELEASE'
+    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+
+    // 인증번호 유효시간 동안 저장
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    //redis
+    implementation 'it.ozimov:embedded-redis:0.7.2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    //      WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:sockjs-client:1.1.2'
+    implementation 'org.webjars:stomp-websocket:2.3.3-1'
+//  xss-filter
+    implementation 'com.navercorp.lucy:lucy-xss-servlet:2.0.0'
+    implementation 'com.navercorp.lucy:lucy-xss:1.6.3'
+//  StringEscapeUtils 를 사용하기 위해 commons-text 의존성 추가
+    implementation 'org.apache.commons:commons-text:1.8'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+jar {
+    enabled = false
 }

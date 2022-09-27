@@ -49,14 +49,19 @@ public class SecurityConfiguration {
                 .accessDeniedHandler(accessDeniedHandlerException)
 
                 .and()
+                .headers().frameOptions().disable()
+
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/member/**").permitAll()
-                .antMatchers("/api/post/**").permitAll()
-                .antMatchers("/api/comment/**").permitAll()
+
+                .antMatchers("/member/**").permitAll()
+                .antMatchers("/post/**").permitAll()
+                .antMatchers("/comment/**").permitAll()
+                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

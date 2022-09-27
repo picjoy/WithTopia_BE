@@ -26,6 +26,11 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 application.properties
+application-jisung.properties
+application-wonyoung.properties
+application.yml
+openvidu-selfsigned.jks
+build.gradle
 
 ### NetBeans ###
 /nbproject/private/

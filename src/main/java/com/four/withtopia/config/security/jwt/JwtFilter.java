@@ -34,7 +34,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // 실제 필터링 로직은 doFilterInternal 에 들어감
 
-    public static String AUTHORIZATION_HEADER = "Authorization";
+    public static String AUTHORIZATION_HEADER = "authorization";
+
+    public static String REFRESH_HEADER = "RefreshToken";
 
     public static String BEARER_PREFIX = "Bearer ";
 
@@ -54,13 +56,21 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+//        Session 의 토큰 값 가져오기
+        String jwt = resolveToken(request);
+        System.out.println("---------------------------------------");
+        System.out.println("UsingMethod : "+request.getMethod());
+        System.out.println("UsingURL : "+request.getRequestURL());
+        System.out.println("AccessToken : "+jwt);
+        System.out.println("UsingIP : "+request.getLocalAddr());
+        System.out.println(request.getProtocol());
+        System.out.println("---------------------------------------");
+
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         //바이트배열을 생성한 다음 키를 생성
         Key key = Keys.hmacShaKeyFor(keyBytes);
-
-        String jwt = resolveToken(request);
-
-        if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)){
+//     JWT 토큰이 정상적이라면 유저정보를 가져오는 부분
+        if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
             //Payload 부분에는 토큰에 담을 정보가 들어있습니다. 여기에 담는 정보의 한 ‘조각’ 을 클레임(claim) 이라고 부름
             // name / value 의 한 쌍으로 이뤄져있습니다.
             Claims claims;
@@ -69,8 +79,10 @@ public class JwtFilter extends OncePerRequestFilter {
             } catch (ExpiredJwtException e) {
                 claims = e.getClaims();
             }
-
-            if (claims.getExpiration().toInstant().toEpochMilli() < Instant.now().toEpochMilli()){
+            System.out.println("----------------Claims-------------------");
+            System.out.println(claims);
+            System.out.println("-----------------------------------------");
+            if (claims.getExpiration().toInstant().toEpochMilli() < Instant.now().toEpochMilli()) {
                 response.setContentType("application/json;charset=UTF-8");
                 response.getWriter().println(
                         new ObjectMapper().writeValueAsString(
@@ -79,7 +91,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 );
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 //SC_BAD_REQUEST = 400
-
             }
 
             String subject = claims.getSubject();
@@ -93,7 +104,7 @@ public class JwtFilter extends OncePerRequestFilter {
             Authentication authentication = new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
+// --------------------------------------------
         filterChain.doFilter(request, response);
 
 
@@ -107,4 +118,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         return null;
     }
+
+    private String resolveRefresh(HttpServletRequest request) {
+        String RefreshToken = request.getHeader(REFRESH_HEADER);
+        if (StringUtils.hasText(RefreshToken)) {
+            return RefreshToken;
+        }
+        return null;
+    }
+
 }

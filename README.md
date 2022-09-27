@@ -8,13 +8,17 @@
 - [배포 사이트](https://warmwinter.co.kr)
 
 ### When
-- 2022.08.26 ~ 
+- 2022.08.26 ~ 10.07
 
 ### Who
-- FE : 김혜진, 서현웅
-- BE : 강지영, 강지성, 조원영
+
+| BACKEND <br/><span style="color: tomato;">LEADER</span> | BACKEND <br/><span style="color: skyblue;">FOLLOWER</span> | BACKEND <br/><span style="color: skyblue;">FOLLOWER</span> | FRONTEND <br/><span style="color: tomato;">LEADER</span> | FRONTEND <br/><span style="color: skyblue;">FOLLOWER</span> | DESIGNER                               |
+|---------------------------------------------------------|------------------------------------------------------------|------------------------------------------------------------|----------------------------------------------------------|-------------------------------------------------------------|----------------------------------------|
+| <p style="text-align: center;">조원영</p>                  | <p style="text-align: center;">강지영</p>                     | <p style="text-align: center;">강지성</p>                     | <p style="text-align: center;">서현웅</p>                   | <p style="text-align: center;">김혜진</p>                      | <p style="text-align: center;">정지현</p> |
+
 
 ### How
+
 - FE : ReactJS
 - BE : Spring
 
