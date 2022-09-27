@@ -18,7 +18,7 @@ public class PopularityService {
     private final MemberRepository memberRepository;
     // 인기 상위 멤버 3명 조회
     public List<MemberResponseDto> topMember() {
-        List<Member> topMember = memberRepository.findTop3ByLikeCountGreaterThanOrderByLikeCountDescCreatedAtAsc(3L);
+        List<Member> topMember = memberRepository.findTop3ByOrderByLikeCountDescCreatedAtAsc();
         List<MemberResponseDto> topThreeDto = new ArrayList<>();
         for (Member member : topMember){
             topThreeDto.add(MemberResponseDto.memberResponseDto(member));
@@ -29,7 +29,7 @@ public class PopularityService {
     // 전체 멤버 랭킹 조회
     public Page<Member> totalMemberRank(int page) {
 
-        PageRequest pageable = PageRequest.of(page-1,6);
+        PageRequest pageable = PageRequest.of(page-1,10);
 
         Page<Member> totalMember = memberRepository.findAllByOrderByLikeCountDescCreatedAtAsc(pageable);
 
