@@ -58,6 +58,9 @@ public class MemberService {
     if (!member.validatePassword(passwordEncoder, requestDto.getPassword())) {
       throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","로그인에 실패했습니다."));
     }
+    if(member.isSuspend()){
+      throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","정지된 계정입니다."));
+    }
 
     response.addHeader("Authorization","Bearer " + tokenProvider.GenerateAccessToken(member));
     response.addHeader("RefreshToken",tokenProvider.GenerateRefreshToken(member));

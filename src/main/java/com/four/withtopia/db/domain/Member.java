@@ -48,9 +48,9 @@ public class Member extends Timestamped {
     @Builder.Default
     private long likeCount = 0;
 
-    // 친구 리스트
-    @OneToMany(mappedBy = "myNickname", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Friend> friends;
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean suspend = false;
 
     @Builder
     public Member(MemberRequestDto requestDto,String password,String image) {
