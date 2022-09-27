@@ -10,8 +10,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
-import static org.springframework.messaging.simp.stomp.StompCommand.CONNECT;
-import static org.springframework.messaging.simp.stomp.StompCommand.DISCONNECT;
+import static org.springframework.messaging.simp.stomp.StompCommand.*;
 
 @Slf4j
 @Component
@@ -24,10 +23,15 @@ public class StompHandler implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         StompCommand command = accessor.getCommand();
-        if (command == CONNECT) {
+        if (command == CONNECT) { // Websocket 연결 종료
             checkToken(accessor);
-
             log.info("connection success");
+        }
+        else if(command == SUBSCRIBE){ // Websocket 구독
+            log.info("subscribe success");
+        }
+        else if(command == UNSUBSCRIBE){ // Websocket 구독취소
+            log.info("unsubscribe success");
         }
         else if (command == DISCONNECT) { // Websocket 연결 종료
             log.info("DISCONNECT");

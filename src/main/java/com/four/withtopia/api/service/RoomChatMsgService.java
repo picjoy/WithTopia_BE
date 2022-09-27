@@ -1,6 +1,10 @@
 package com.four.withtopia.api.service;
 
+import com.four.withtopia.db.domain.BenMember;
 import com.four.withtopia.db.domain.ChatMessage;
+import com.four.withtopia.db.domain.Member;
+import com.four.withtopia.db.repository.BenMemberRepository;
+import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.dto.stomp.RoomChatMsgDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,10 +12,14 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RoomChatMsgService {
+
+    private final MemberRepository memberRepository;
+    private final BenMemberRepository benMemberRepository;
 
     // 주고받는 메세지
     public RoomChatMsgDto createRoomChatMessage(String roomId, ChatMessage chatMsgDto){
@@ -28,7 +36,7 @@ public class RoomChatMsgService {
             RoomChatMsgDto enterMsg =  RoomChatMsgDto.builder()
                     .roomId(roomId)
                     .type(chatMsgDto.getType())
-                    .message(chatMsgDto.getSender() + "가 입장했습니다.")
+                    .message(chatMsgDto.getSender() + "님이 입장했습니다.")
                     .sender(chatMsgDto.getSender())
                     .date(date)
                     .build();
@@ -44,7 +52,7 @@ public class RoomChatMsgService {
             RoomChatMsgDto leaveMsg =  RoomChatMsgDto.builder()
                     .roomId(roomId)
                     .type(chatMsgDto.getType())
-                    .message(chatMsgDto.getSender() + "가 나갔습니다.")
+                    .message(chatMsgDto.getSender() + "님이 나갔습니다.")
                     .sender(chatMsgDto.getSender())
                     .date(date)
                     .build();
@@ -52,6 +60,29 @@ public class RoomChatMsgService {
             System.out.println("enterMsg = " + leaveMsg);
 
             return leaveMsg;
+        }
+
+        // 강퇴 메세지
+        if(chatMsgDto.getType().equals(ChatMessage.MessageType.BEN)){
+            System.out.println("강퇴");
+            RoomChatMsgDto benMsg =  RoomChatMsgDto.builder()
+                    .roomId(roomId)
+                    .type(chatMsgDto.getType())
+                    .message(chatMsgDto.getReceive() + "님이 강퇴되셨습니다.")
+                    .date(date)
+                    .build();
+
+            System.out.println("enterMsg = " + benMsg);
+
+            // 강퇴 멤버 저장
+            Optional<Member> member = memberRepository.findByNickName(chatMsgDto.getReceive());
+            BenMember benMember = BenMember.builder()
+                            .memberId(member.get().getMemberId())
+                            .roomId(chatMsgDto.getRoomId())
+                            .build();
+            benMemberRepository.save(benMember);
+
+            return benMsg;
         }
 
         RoomChatMsgDto talkMsg =  RoomChatMsgDto.builder()
