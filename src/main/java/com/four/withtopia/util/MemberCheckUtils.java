@@ -37,6 +37,11 @@ public class MemberCheckUtils {
             throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","탈퇴한지 3일이 경과하지 않았습니다."));
         }
 
+        // 멤버의 계정이 정지된 경우
+        if(member.isSuspend()){
+            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","이 계정은 정지된 계정입니다."));
+        }
+
         return member;
     }
 }

@@ -77,4 +77,9 @@ public class MemberController {
     return new ResponseUtil<>().forSuccess(memberService.reissue(request, response));
   }
 
+  @ApiOperation(value = "계정 정리")
+  @RequestMapping(value = "/member/suspend/{memberId}", method = RequestMethod.PUT)
+  public void memberSuspend(@PathVariable Long memberId){
+    memberService.memberSuspend(memberId);
+  }
 }

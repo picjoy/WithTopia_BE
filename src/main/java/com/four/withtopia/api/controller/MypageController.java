@@ -4,6 +4,7 @@ import com.four.withtopia.api.service.MypageService;
 import com.four.withtopia.config.expection.PrivateResponseBody;
 import com.four.withtopia.dto.request.ChangePasswordRequestDto;
 import com.four.withtopia.dto.request.ProfileUpdateRequestDto;
+import com.four.withtopia.util.InsertImageUtil;
 import com.four.withtopia.util.ResponseUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +49,7 @@ public class MypageController {
     @ApiOperation(value = "이미지 저장")
     @RequestMapping(value = "/image", method = RequestMethod.POST)
     public ResponseEntity<PrivateResponseBody> reissue(@RequestPart MultipartFile multipartFile) throws IOException {
-        return new ResponseUtil<>().forSuccess(mypageService.insertImage(multipartFile));
+        return new ResponseUtil<>().forSuccess(mypageService.insertProfileImage(multipartFile));
     }
 
     @ApiOperation(value = "설정 가능한 이미지 조회")
