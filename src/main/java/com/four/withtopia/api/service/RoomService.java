@@ -142,20 +142,27 @@ public class RoomService {
                 .build();
     }
 
-    // 전체 방 조회하기
-    public Page<Room> getAllRooms(int page) {
-        PageRequest pageable = PageRequest.of(page-1,6);
-
-        Page<Room> allRooms = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
-
-        return allRooms;
-    }
+//    // 전체 방 조회하기
+//    public Page<Room> getAllRooms(int page) {
+//        PageRequest pageable = PageRequest.of(page-1,6);
+//
+//        Page<Room> allRooms = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
+//
+//        return allRooms;
+//    }
 
     // 키워드로 채팅방 검색하기
     public Page<Room> searchRoom(String keyword, int page) {
         PageRequest pageable = PageRequest.of(page-1,6);
 
-        Page<Room> searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
+        System.out.println(keyword);
+        Page<Room> searchRoom;
+        if (keyword == null || keyword.isBlank() || keyword.isEmpty()) {
+            searchRoom = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
+            return searchRoom;
+        } else {
+            searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
+        }
 
         // 검색 결과가 없다면
         if (searchRoom.isEmpty()){
