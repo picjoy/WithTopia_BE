@@ -1,6 +1,8 @@
 package com.four.withtopia.config.stomp;
 
+import com.four.withtopia.api.service.RoomService;
 import com.four.withtopia.config.security.jwt.TokenProvider;
+import com.four.withtopia.db.domain.RoomMember;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -17,6 +19,7 @@ import static org.springframework.messaging.simp.stomp.StompCommand.*;
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
     private final TokenProvider tokenProvider;
+    private final RoomService roomService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -33,7 +36,7 @@ public class StompHandler implements ChannelInterceptor {
         else if(command == UNSUBSCRIBE){ // Websocket 구독취소
             log.info("unsubscribe success");
         }
-        else if (command == DISCONNECT) { // Websocket 연결 종료
+        else if (command == DISCONNECT) { // Websocket 연결 종
             log.info("DISCONNECT");
         }
 

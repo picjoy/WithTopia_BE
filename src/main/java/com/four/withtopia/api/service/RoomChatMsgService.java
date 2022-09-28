@@ -1,12 +1,15 @@
 package com.four.withtopia.api.service;
 
-import com.four.withtopia.db.domain.BenMember;
-import com.four.withtopia.db.domain.ChatMessage;
-import com.four.withtopia.db.domain.Member;
+import com.four.withtopia.config.error.ErrorCode;
+import com.four.withtopia.config.expection.PrivateException;
+import com.four.withtopia.db.domain.*;
 import com.four.withtopia.db.repository.BenMemberRepository;
 import com.four.withtopia.db.repository.MemberRepository;
+import com.four.withtopia.db.repository.RoomMemberRepository;
+import com.four.withtopia.db.repository.RoomRepository;
 import com.four.withtopia.dto.stomp.RoomChatMsgDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +23,8 @@ public class RoomChatMsgService {
 
     private final MemberRepository memberRepository;
     private final BenMemberRepository benMemberRepository;
+    private final RoomMemberRepository roomMemberRepository;
+    private final RoomRepository roomRepository;
 
     // 주고받는 메세지
     public RoomChatMsgDto createRoomChatMessage(String roomId, ChatMessage chatMsgDto){
@@ -69,6 +74,7 @@ public class RoomChatMsgService {
                     .roomId(roomId)
                     .type(chatMsgDto.getType())
                     .message(chatMsgDto.getReceive() + "님이 강퇴되셨습니다.")
+                    .receive(chatMsgDto.getReceive())
                     .date(date)
                     .build();
 
@@ -81,6 +87,22 @@ public class RoomChatMsgService {
                             .roomId(chatMsgDto.getRoomId())
                             .build();
             benMemberRepository.save(benMember);
+
+            //강퇴 멤버 룸멤버 리스트에서 지우기
+            // 방이 있는 지 확인
+            Room room = roomRepository.findById(chatMsgDto.getRoomId()).orElseThrow(
+                    () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다."))
+            );
+            // 룸 멤버 찾기
+            RoomMember roomMember = roomMemberRepository.findBySessionIdAndNickname(chatMsgDto.getRoomId(), chatMsgDto.getReceive()).orElseThrow(
+                    () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방에 있는 멤버가 아닙니다."))
+            );
+            // 룸 멤버 삭제
+            roomMemberRepository.delete(roomMember);
+            // 룸 멤버 수 변경
+            room.updateCntMember(room.getCntMember() -1);
+            // 룸 변경사항 저장
+            roomRepository.save(room);
 
             return benMsg;
         }
