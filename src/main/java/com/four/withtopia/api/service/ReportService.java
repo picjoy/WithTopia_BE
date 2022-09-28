@@ -20,15 +20,12 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @Service
 @RequiredArgsConstructor
 public class ReportService {
     private final ReportRepository reportRepository;
+    private final MemberRepository memberRepository;
     private final MemberCheckUtils memberCheckUtils;
     private final InsertImageUtil insertImageUtil;
     private final JavaMailSenderImpl mailSender;
@@ -39,11 +36,14 @@ public class ReportService {
         // 토큰 검증
         Member reportBy = memberCheckUtils.checkMember(request);
 
+        Member reportTo = memberRepository.findByNickName(requestDto.getToNickname()).orElseThrow(()
+                -> new PrivateException(new ErrorCode(HttpStatus.OK,"200","해당 유저가 세션에 없습니다.")));
+
         if(requestDto.getImage() != null){
             String imgUrl = insertImageUtil.insertImage(requestDto.getImage());
             Report newReport = Report.builder()
-                    .reportTo(requestDto.getNickname())
-                    .reportToId(requestDto.getMemberId())
+                    .reportTo(reportTo.getNickName())
+                    .reportToId(reportTo.getMemberId())
                     .reportBy(reportBy.getNickName())
                     .reportById(reportBy.getMemberId())
                     .content(requestDto.getContent())
@@ -58,8 +58,8 @@ public class ReportService {
 
         // report 추가하기
         Report newReport = Report.builder()
-                .reportTo(requestDto.getNickname())
-                .reportToId(requestDto.getMemberId())
+                .reportTo(reportTo.getNickName())
+                .reportToId(reportTo.getMemberId())
                 .reportBy(reportBy.getNickName())
                 .reportById(reportBy.getMemberId())
                 .content(requestDto.getContent())

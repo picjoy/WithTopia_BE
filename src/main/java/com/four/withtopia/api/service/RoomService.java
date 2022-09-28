@@ -3,9 +3,11 @@ package com.four.withtopia.api.service;
 
 import com.four.withtopia.config.error.ErrorCode;
 import com.four.withtopia.config.expection.PrivateException;
+import com.four.withtopia.db.domain.BenMember;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.Room;
 import com.four.withtopia.db.domain.RoomMember;
+import com.four.withtopia.db.repository.BenMemberRepository;
 import com.four.withtopia.db.repository.RoomMemberRepository;
 import com.four.withtopia.db.repository.RoomRepository;
 import com.four.withtopia.dto.request.MakeRoomRequestDto;
@@ -37,6 +39,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final RoomMemberRepository roomMemberRepository;
     private final MemberCheckUtils memberCheckUtils;
+    private final BenMemberRepository benMemberRepository;
 
     // SDK의 진입점인 OpenVidu 개체
     private OpenVidu openVidu;
@@ -209,6 +212,11 @@ public class RoomService {
         Room room = roomRepository.findById(SessionId).orElseThrow(
                 () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","해당 방이 없습니다.")));
 
+        // 방에서 강퇴당한 멤버인지 확인
+        BenMember benMember = benMemberRepository.findByMemberId(member.getMemberId());
+        if(benMember != null){
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","강퇴당한 방입니다."));
+        }
         // 방 인원 초과 시
         if (room.getCntMember() >= room.getMaxMember()){
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 가득찼습니다."));
