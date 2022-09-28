@@ -136,6 +136,9 @@ public class MemberService {
         if (validationUtil.nicknameExist(requestDto.getNickname())) {
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 존재하는 닉네임 입니다."));
         }
+        if (requestDto.getNickname().length() < 2 || requestDto.getNickname().length() > 12) {
+        throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "닉네임 양식에 맞지 않습니다."));
+        }
 //        if (requestDto.getAuthKey() == null) {
 //            return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
 //        }
