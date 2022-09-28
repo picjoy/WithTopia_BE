@@ -20,5 +20,8 @@ public class ReportController {
         System.out.println("requestDto.getContent() = " + requestDto.getContent());
         return new ResponseUtil<>().forSuccess(reportService.createReport(requestDto, request));
     }
-
+    @GetMapping("/report")
+    public ResponseEntity<?> Report(@RequestParam String sessionID) throws IOException {
+        return new ResponseUtil<>().forSuccess(reportService.ShowRoomMember(sessionID));
+    }
 }
