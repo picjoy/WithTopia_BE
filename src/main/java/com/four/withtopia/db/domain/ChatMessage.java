@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 public class ChatMessage {
     public enum MessageType {
-        ENTER, TALK, EXIT
+        ENTER, TALK, EXIT, BEN
     }
 
     private MessageType type;
@@ -17,6 +17,8 @@ public class ChatMessage {
     private String roomId;
     //보내는 사람
     private String sender;
+    // 받는 사람
+    private String receive;
     //내용
     private String message;
 }

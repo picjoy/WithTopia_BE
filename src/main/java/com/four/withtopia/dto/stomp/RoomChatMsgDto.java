@@ -15,6 +15,8 @@ public class RoomChatMsgDto {
     private String roomId;
     //보내는 사람
     private String sender;
+    // 받는 사람
+    private String receive;
     //내용
     private String message;
     private String date;
