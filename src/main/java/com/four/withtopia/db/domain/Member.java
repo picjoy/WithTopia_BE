@@ -96,11 +96,11 @@ public class Member extends Timestamped {
 
     // 멤버 프로필 업데이트
     public void updateMember(ProfileUpdateRequestDto requestDto, Member member){
-        if(requestDto.getNickName() == null){
+        if(requestDto.getNickName() == null || Objects.equals(requestDto.getNickName(), "")){
             this.nickName = member.getNickName();
             this.profileImage = requestDto.getProfileImage();
         }
-        else if(requestDto.getProfileImage() == null){
+        else if(requestDto.getProfileImage() == null || Objects.equals(requestDto.getProfileImage(), "")){
             this.nickName = requestDto.getNickName();
             this.profileImage = member.getProfileImage();
         }

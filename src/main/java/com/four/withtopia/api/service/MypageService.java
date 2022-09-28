@@ -51,6 +51,8 @@ public class MypageService {
         String Pattern =  "^[a-zA-Z\\d]{2,12}$";
 
         if(!requestDto.getNickName().matches(Pattern)){
+            response.addHeader("Authorization", request.getHeader("Authorization"));
+            response.addHeader("RefreshToken", request.getHeader("RefreshToken"));
             throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","닉네임 양식에 맞지 않습니다."));
         }
 

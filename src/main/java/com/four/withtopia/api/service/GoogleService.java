@@ -112,7 +112,7 @@ public class GoogleService {
         int randomInt = new Random().nextInt(images.size());
 
         return Member.builder()
-                .kakaoId(googleUserInfo.getGoogleId())
+                .googleId(googleUserInfo.getGoogleId())
                 .nickName(googleUserInfo.getNickName() + "_google_" + usernameId)
                 .email(googleUserInfo.getEmail())
                 .profileImage(images.get(randomInt).getProfileIamge())
