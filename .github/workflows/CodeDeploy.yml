@@ -105,10 +105,10 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           envs: GITHUB_SHA,DOCKER_IMG_FULL_NAME
           script: |
-            docker stop ${{ secrets.DOCKER_USERNAME }}  
-            docker rm ${{ secrets.DOCKER_USERNAME }} 
+            docker stop ${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_NAME }} 
+            docker rm ${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_NAME }}  
             yes | docker image prune -a
             docker pull $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7} 
             nohup docker run -d -p 8080:8080 --name ${{ secrets.DOCKER_USERNAME }} $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
-            nohup docker run -d -p 8081:8080 --name ${{ secrets.DOCKER_USERNAME }} $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
+            nohup docker run -d -p 8081:8080 --name ${{ secrets.DOCKER_NAME }} $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
             echo "server on....."
