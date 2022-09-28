@@ -110,4 +110,5 @@ jobs:
             yes | docker image prune -a
             docker pull $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7} 
             nohup docker run -d -p 8080:8080 --name ${{ secrets.DOCKER_USERNAME }} $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
+            nohup docker run -d -p 8081:8080 --name ${{ secrets.DOCKER_USERNAME }} $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
             echo "server on....."
