@@ -6,7 +6,9 @@ import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.Report;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.ReportRepository;
+import com.four.withtopia.db.repository.RoomMemberRepository;
 import com.four.withtopia.dto.request.ReportRequestDto;
+import com.four.withtopia.dto.response.RoomMemberResponseDto;
 import com.four.withtopia.util.InsertImageUtil;
 import com.four.withtopia.util.MailUtils;
 import com.four.withtopia.util.MemberCheckUtils;
@@ -20,12 +22,16 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
 public class ReportService {
     private final ReportRepository reportRepository;
     private final MemberRepository memberRepository;
+    private final RoomMemberRepository roomMemberRepository;
     private final MemberCheckUtils memberCheckUtils;
     private final InsertImageUtil insertImageUtil;
     private final JavaMailSenderImpl mailSender;
@@ -94,6 +100,13 @@ public class ReportService {
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","메일 발송에 실패했습니다."));
         }
+    }
+
+    public List<RoomMemberResponseDto> ShowRoomMember(String SessionID) {
+        return roomMemberRepository.findAllBySessionId(SessionID)
+                .stream()
+                .map(RoomMemberResponseDto::new)
+                .collect(toList());
     }
 
 }
