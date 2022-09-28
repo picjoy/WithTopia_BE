@@ -48,10 +48,9 @@ public class MypageService {
         // 토큰 검사
         Member member = memberCheckUtils.checkMember(request);
 
-        String Pattern =  "^[a-zA-Z\\d]{2,12}$";
-
-        if(!requestDto.getNickName().matches(Pattern)){
-            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","닉네임 양식에 맞지 않습니다."));
+        // 닉네임 양식 확인
+        if (requestDto.getNickName().length() < 2 || requestDto.getNickName().length()  > 12){
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","닉네임 양식에 맞지 않습니다."));
         }
 
         member.updateMember(requestDto, member);
