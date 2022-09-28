@@ -63,6 +63,10 @@ public class RoomService {
         String Pattern =  "^[a-zA-Z\\d!@#$%^&*]{4,12}$";
         System.out.println(makeRoomRequestDto.getPassword().matches(Pattern));
 
+        if (makeRoomRequestDto.getRoomTitle().length() < 2 || makeRoomRequestDto.getRoomTitle().length() > 14){
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","제목 양식에 맞지 않습니다."));
+        }
+
 
         if(!makeRoomRequestDto.isStatus()&&!makeRoomRequestDto.getPassword().matches(Pattern)){
             throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","비밀번호 양식이 맞지않습니다."));
@@ -161,6 +165,9 @@ public class RoomService {
             searchRoom = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
             return searchRoom;
         } else {
+            if (keyword.length() < 2 || keyword.length() >14){
+                throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","검색 양식에 맞지 않습니다."));
+            }
             searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
         }
 
