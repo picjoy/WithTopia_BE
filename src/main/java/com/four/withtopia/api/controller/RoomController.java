@@ -33,7 +33,7 @@ public class RoomController {
     }
 
     //전체 방 조회 페이지처리
-    @ApiOperation(value = "방 전체 조회 메소드")
+    @ApiOperation(value = "방 전체 조회 및 검색 메소드")
     @GetMapping("/rooms/{page}")
     public ResponseEntity<PrivateResponseBody> getAllRooms(@PathVariable int page, @RequestParam(required = false) String keyword) {
         return new ResponseUtil<>().forSuccess(roomService.searchRoom(keyword, page));
