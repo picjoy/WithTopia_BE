@@ -68,6 +68,9 @@ dependencies {
     implementation 'com.navercorp.lucy:lucy-xss:1.6.3'
 //  StringEscapeUtils 를 사용하기 위해 commons-text 의존성 추가
     implementation 'org.apache.commons:commons-text:1.8'
+//   서버 감시를 위한 watchdogs
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
