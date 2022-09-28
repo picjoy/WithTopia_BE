@@ -9,4 +9,9 @@ import lombok.RequiredArgsConstructor;
 public class ProfileUpdateRequestDto {
     private String nickName;
     private String profileImage;
+
+    public void nicknameUpdateRequestDto(String nickName) {
+        this.nickName = nickName;
+    }
+
 }
