@@ -63,6 +63,10 @@ public class RoomService {
         String Pattern =  "^[a-zA-Z\\d!@#$%^&*]{4,12}$";
         System.out.println(makeRoomRequestDto.getPassword().matches(Pattern));
 
+        if (makeRoomRequestDto.getRoomTitle().length() < 2 || makeRoomRequestDto.getRoomTitle().length() > 14){
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","제목 양식에 맞지 않습니다."));
+        }
+
 
         if(!makeRoomRequestDto.isStatus()&&!makeRoomRequestDto.getPassword().matches(Pattern)){
             throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","비밀번호 양식이 맞지않습니다."));
@@ -142,20 +146,30 @@ public class RoomService {
                 .build();
     }
 
-    // 전체 방 조회하기
-    public Page<Room> getAllRooms(int page) {
-        PageRequest pageable = PageRequest.of(page-1,6);
-
-        Page<Room> allRooms = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
-
-        return allRooms;
-    }
+//    // 전체 방 조회하기
+//    public Page<Room> getAllRooms(int page) {
+//        PageRequest pageable = PageRequest.of(page-1,6);
+//
+//        Page<Room> allRooms = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
+//
+//        return allRooms;
+//    }
 
     // 키워드로 채팅방 검색하기
     public Page<Room> searchRoom(String keyword, int page) {
         PageRequest pageable = PageRequest.of(page-1,6);
 
-        Page<Room> searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
+        System.out.println(keyword);
+        Page<Room> searchRoom;
+        if (keyword == null || keyword.isBlank() || keyword.isEmpty()) {
+            searchRoom = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
+            return searchRoom;
+        } else {
+            if (keyword.length() < 2 || keyword.length() >14){
+                throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","검색 양식에 맞지 않습니다."));
+            }
+            searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
+        }
 
         // 검색 결과가 없다면
         if (searchRoom.isEmpty()){
