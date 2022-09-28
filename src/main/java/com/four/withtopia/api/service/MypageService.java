@@ -50,6 +50,8 @@ public class MypageService {
 
         // 닉네임 양식 확인
         if (requestDto.getNickName().length() < 2 || requestDto.getNickName().length()  > 12){
+            response.addHeader("Authorization", request.getHeader("Authorization"));
+            response.addHeader("RefreshToken", request.getHeader("RefreshToken"));
             throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","닉네임 양식에 맞지 않습니다."));
         }
 
