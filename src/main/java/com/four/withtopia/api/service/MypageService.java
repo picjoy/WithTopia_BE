@@ -48,6 +48,13 @@ public class MypageService {
         // 토큰 검사
         Member member = memberCheckUtils.checkMember(request);
 
+        // 만약 닉네임이 null이면
+        if(requestDto.getNickName()==null || requestDto.getNickName().isEmpty() || requestDto.getNickName().isBlank()){
+            requestDto.nicknameUpdateRequestDto(member.getNickName());
+            System.out.println("==========================================");
+            System.out.println(requestDto.getNickName());
+        }
+
         // 닉네임 양식 확인
         if (requestDto.getNickName().length() < 2 || requestDto.getNickName().length()  > 12){
             response.addHeader("Authorization", request.getHeader("Authorization"));
