@@ -95,7 +95,7 @@ public class KakaoService {
         Member kakaoUser = memberRepository.findByKakaoId(kakaoUserId);
 
         // 이미 가입한 메일이면 이미 가입한 멤버라고 알려주기
-        if(memberRepository.existsByEmail(kakaoUserInfo.getEmail())){
+        if(kakaoUser == null && memberRepository.existsByEmail(kakaoUserInfo.getEmail())){
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400", "동일한 이메일이 이미 존재합니다."));
         }
 
