@@ -213,7 +213,7 @@ public class RoomService {
                 () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","해당 방이 없습니다.")));
 
         // 방에서 강퇴당한 멤버인지 확인
-        BenMember benMember = benMemberRepository.findByMemberId(member.getMemberId());
+        BenMember benMember = benMemberRepository.findByMemberIdAndRoomId(member.getMemberId(), SessionId);
         if(benMember != null){
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","강퇴당한 방입니다."));
         }
