@@ -27,6 +27,7 @@ public class RoomChatMsgController {
 
     @MessageMapping("/chat/{roomId}")
     public void chat(@DestinationVariable String roomId, @RequestBody ChatMessage message){
+        System.out.println("send는 성공");
         RoomChatMsgDto chatMessage = roomChatMsgService.createRoomChatMessage(roomId, message);
         ChannelTopic topic = new ChannelTopic(roomId);
         redisMessageListenerContainer.addMessageListener(redisSubscriber, topic);
