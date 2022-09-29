@@ -10,7 +10,7 @@ on:
 # 본인이 설정한 값을 여기서 채워넣습니다.
 # 리전, 버킷 이름, CodeDeploy 앱 이름, CodeDeploy 배포 그룹 이름
 env:
-  DOCKER_IMG_FULL_NAME: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}
+  DOCKER_IMG_FULL_NAME: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:${{ secrets.DOCKER_TAG }}
 #  COMMIT_NUM: ${GITHUB_SHA::7}
 #  AWS_REGION: ap-northeast-2
 #  S3_BUCKET_NAME: hanghae99-wonyoung
@@ -93,8 +93,8 @@ jobs:
       - name: web docker build and push
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
-          docker build -t $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7} .
-          docker push $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
+          docker build -t $DOCKER_IMG_FULL_NAME .
+          docker push $DOCKER_IMG_FULL_NAME
 
         ## docker compose up
       - name: executing remote ssh commands using password
@@ -108,6 +108,6 @@ jobs:
             docker stop ${{ secrets.DOCKER_USERNAME }}
             docker rm ${{ secrets.DOCKER_USERNAME }}
             yes | docker image prune -a
-            docker pull $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7} 
-            nohup docker run -d -p 8080:8080 --name ${{ secrets.DOCKER_USERNAME }} $DOCKER_IMG_FULL_NAME:${GITHUB_SHA::7}
+            docker pull $DOCKER_IMG_FULL_NAME
+            nohup docker run -d -p 8080:8080 --name ${{ secrets.DOCKER_USERNAME }} $DOCKER_IMG_FULL_NAME
             echo "server on....."
