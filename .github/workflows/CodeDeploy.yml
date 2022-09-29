@@ -11,12 +11,6 @@ on:
 # 리전, 버킷 이름, CodeDeploy 앱 이름, CodeDeploy 배포 그룹 이름
 env:
   DOCKER_IMG_FULL_NAME: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:${{ secrets.DOCKER_TAG }}
-#  COMMIT_NUM: ${GITHUB_SHA::7}
-#  AWS_REGION: ap-northeast-2
-#  S3_BUCKET_NAME: hanghae99-wonyoung
-#  CODE_DEPLOY_APPLICATION_NAME: git_action_wonyoung
-#  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: git_action_wonyoung
-
 
 jobs:
   deploy:
@@ -55,40 +49,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
-#      - name: Build with Gradle
-#        run: ./gradlew bootJar
 
-        #      # (3) Gradle build (Test 제외)
-        #      - name: Build with Gradle
-        #        uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-        #        with:
-        #          arguments: clean build -x test
-
-        #    # (4) AWS 인증 (IAM 사용자 Access Key, Secret Key 활용)
-        #    - name: Configure AWS credentials
-        #      uses: aws-actions/configure-aws-credentials@v1
-        #      with:
-        #        aws-access-key-id: ${{ secrets.ACCESS_KEY }}
-        #        aws-secret-access-key: ${{ secrets.SECRET_KEY }}
-        #        aws-region: ${{ env.AWS_REGION }}
-        #
-        #    # (5) 빌드 결과물을 S3 버킷에 업로드
-        #    - name: Upload to AWS S3
-        #      run: |
-        #        aws deploy push \
-        #          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-        #          --ignore-hidden-files \
-        #          --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
-        #          --source .
-        #    # (6) S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
-        #    - name: Deploy to AWS EC2 from S3
-        #      run: |
-        #        aws deploy create-deployment \
-        #          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-        #          --deployment-config-name CodeDeployDefault.AllAtOnce \
-        #          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-        #          --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
-        ## 웹 이미지 빌드 및 도커허브에 push
 
       - name: web docker build and push
         run: |
@@ -105,9 +66,6 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           envs: GITHUB_SHA,DOCKER_IMG_FULL_NAME
           script: |
-            docker stop ${{ secrets.DOCKER_USERNAME }}
-            docker rm ${{ secrets.DOCKER_USERNAME }}
-            yes | docker image prune -a
-            docker pull $DOCKER_IMG_FULL_NAME
-            nohup docker run -d -p 8080:8080 --name ${{ secrets.DOCKER_USERNAME }} $DOCKER_IMG_FULL_NAME
-            echo "server on....."
+            echo "run script..."
+            ./deploy.sh
+            echo "server run..."
