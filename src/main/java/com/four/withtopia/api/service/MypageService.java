@@ -62,6 +62,11 @@ public class MypageService {
             throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","닉네임 양식에 맞지 않습니다."));
         }
 
+        // 멤버 db에 동일한 닉네임이 있으면 예외
+        if(memberRepository.existsByNickName(requestDto.getNickName())){
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","동일한 닉네임이 이미 존재합니다."));
+        }
+
         member.updateMember(requestDto, member);
         memberRepository.save(member);
         MypageResponseDto responseDto = MypageResponseDto.createMypageResponseDto(member);
