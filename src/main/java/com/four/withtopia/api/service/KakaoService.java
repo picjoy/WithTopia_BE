@@ -99,6 +99,11 @@ public class KakaoService {
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400", "동일한 이메일이 이미 존재합니다."));
         }
 
+        // 탈퇴한지 3일이 되지 않은 유저 예외처리
+        if(kakaoUser != null && kakaoUser.isDelete()){
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400", "이미 탈퇴한 멤버입니다."));
+        }
+
         // 없으면 회원가입 진행
         if (kakaoUser == null) {
             Member newMember = ConvertingKakaoUserToMember(kakaoUserInfo);
