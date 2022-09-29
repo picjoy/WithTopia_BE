@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -81,20 +80,22 @@ public class RoomChatMsgService {
             System.out.println("enterMsg = " + benMsg);
 
             // 강퇴 멤버 저장
-            Optional<Member> member = memberRepository.findByNickName(chatMsgDto.getReceive());
+            Member member = memberRepository.findByNickName(chatMsgDto.getReceive()).orElseThrow(
+                    () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","사용자가 존재하지 않습니다.")));
+
             BenMember benMember = BenMember.builder()
-                            .memberId(member.get().getMemberId())
-                            .roomId(chatMsgDto.getRoomId())
+                            .memberId(member.getMemberId())
+                            .roomId(roomId)
                             .build();
             benMemberRepository.save(benMember);
 
             //강퇴 멤버 룸멤버 리스트에서 지우기
             // 방이 있는 지 확인
-            Room room = roomRepository.findById(chatMsgDto.getRoomId()).orElseThrow(
+            Room room = roomRepository.findById(roomId).orElseThrow(
                     () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다."))
             );
             // 룸 멤버 찾기
-            RoomMember roomMember = roomMemberRepository.findBySessionIdAndNickname(chatMsgDto.getRoomId(), chatMsgDto.getReceive()).orElseThrow(
+            RoomMember roomMember = roomMemberRepository.findBySessionIdAndNickname(roomId, chatMsgDto.getReceive()).orElseThrow(
                     () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방에 있는 멤버가 아닙니다."))
             );
             // 룸 멤버 삭제
