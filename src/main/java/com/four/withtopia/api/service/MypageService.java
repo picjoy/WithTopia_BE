@@ -57,13 +57,14 @@ public class MypageService {
 
         // 닉네임 양식 확인
         if (requestDto.getNickName().length() < 2 || requestDto.getNickName().length()  > 6){
-            response.addHeader("Authorization", request.getHeader("Authorization"));
-            response.addHeader("RefreshToken", request.getHeader("RefreshToken"));
+            responseToken(response, request);
             throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","닉네임 양식에 맞지 않습니다."));
         }
 
         // 멤버 db에 동일한 닉네임이 있으면 예외
-        if(memberRepository.existsByNickName(requestDto.getNickName())){
+        Member existsNickname = memberRepository.findByNickName(requestDto.getNickName()).orElse(null);
+        if(existsNickname != null && !Objects.equals(member.getMemberId(), existsNickname.getMemberId())){
+            responseToken(response, request);
             throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","동일한 닉네임이 이미 존재합니다."));
         }
 
@@ -79,6 +80,11 @@ public class MypageService {
         response.addHeader("RefreshToken", refreshToken);
 
         return responseDto;
+    }
+
+    private void responseToken(HttpServletResponse response, HttpServletRequest request) {
+        response.addHeader("Authorization", request.getHeader("Authorization"));
+        response.addHeader("RefreshToken", request.getHeader("RefreshToken"));
     }
 
     @Transactional
