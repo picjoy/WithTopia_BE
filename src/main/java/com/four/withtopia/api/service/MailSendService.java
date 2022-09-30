@@ -75,7 +75,7 @@ public class MailSendService {
 //    }
 
     public String saveAuth(String email) throws MessagingException, UnsupportedEncodingException {
-        String emailpatern = "^[a-zA-Z0-9]+@[a-zA-Z0-9-]+[a-zA-Z0-9-.]+$";
+        String emailpatern = "^[a-zA-Z0-9_]+@[a-zA-Z0-9-]+[a-zA-Z0-9-.]+$";
         if (memberRepository.existsByEmail(email)){
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 존재하는 이메일입니다."));
         }
