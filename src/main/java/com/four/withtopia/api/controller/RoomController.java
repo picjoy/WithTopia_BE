@@ -35,8 +35,8 @@ public class RoomController {
     //전체 방 조회 페이지처리
     @ApiOperation(value = "방 전체 조회 및 검색 메소드")
     @GetMapping("/rooms/{page}")
-    public ResponseEntity<PrivateResponseBody> getAllRooms(@PathVariable int page, @RequestParam(required = false) String keyword) {
-        return new ResponseUtil<>().forSuccess(roomService.searchRoom(keyword, page));
+    public ResponseEntity<PrivateResponseBody> getAllRooms(@PathVariable int page) {
+        return new ResponseUtil<>().forSuccess(roomService.getAllRooms(page));
     }
 
     // 방 접속
@@ -69,11 +69,11 @@ public class RoomController {
     }
 
 
-//    // 키워드로 방 검색
-//    @ApiOperation(value = "방 찾기 메소드")
-//    @GetMapping("/rooms/search/{page}")
-//    public ResponseEntity<?> searchRoom(@PathVariable int page, @RequestParam String keyword){
-//        return new ResponseUtil<>().forSuccess(roomService.searchRoom(keyword,page));
-//    }
+    // 키워드로 방 검색
+    @ApiOperation(value = "방 찾기 메소드")
+    @GetMapping("/rooms/search/{page}")
+    public ResponseEntity<?> searchRoom(@PathVariable int page, @RequestParam String keyword){
+        return new ResponseUtil<>().forSuccess(roomService.searchRoom(keyword,page));
+    }
 
 }

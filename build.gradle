@@ -71,6 +71,7 @@ dependencies {
 //   서버 감시를 위한 watchdogs
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation group: 'com.querydsl', name: 'querydsl-jpa', version: '4.1.4'
 }
 
 tasks.named('test') {
