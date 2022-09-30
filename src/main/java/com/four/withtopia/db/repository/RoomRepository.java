@@ -11,9 +11,9 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     void delete(Room room);
 
 
-    Page<Room> findByOrderByModifiedAtAsc(Pageable pageable);
+    Page<Room> findByOrderByModifiedAtDesc(Pageable pageable);
 
     // Containing을 붙여주면 Like 검색이 가능
     // %{keyword}%가 가능
-    Page<Room> findByRoomTitleContainingOrderByModifiedAtAsc(String keyword, Pageable pageable);
+    Page<Room> findByRoomTitleContainingOrderByModifiedAtDesc(String keyword, Pageable pageable);
 }

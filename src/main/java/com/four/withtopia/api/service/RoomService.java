@@ -152,13 +152,13 @@ public class RoomService {
     // 전체 방 조회하기
     public Page<Room> getAllRooms(int page) {
         PageRequest pageable = PageRequest.of(page - 1, 8);
-        return roomRepository.findByOrderByModifiedAtAsc(pageable);
+        return roomRepository.findByOrderByModifiedAtDesc(pageable);
     }
     // 키워드로 채팅방 검색하기
     public Page<Room> searchRoom(String keyword, int page) {
         PageRequest pageable = PageRequest.of(page - 1, 8);
 
-        Page<Room> searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
+        Page<Room> searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtDesc(keyword, pageable);
         if (keyword.length() < 2 || keyword.length() > 14) {
             throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "검색 양식에 맞지 않습니다."));
         }
