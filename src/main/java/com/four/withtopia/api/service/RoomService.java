@@ -63,16 +63,16 @@ public class RoomService {
         //토큰 검증 및 멤버 객체 가져오기
         Member member = memberCheckUtils.checkMember(request);
 
-        String Pattern =  "^[a-zA-Z\\d!@#$%^&*]{4,12}$";
+        String Pattern = "^[a-zA-Z\\d!@#$%^&*]{4,12}$";
         System.out.println(makeRoomRequestDto.getPassword().matches(Pattern));
 
-        if (makeRoomRequestDto.getRoomTitle().length() < 2 || makeRoomRequestDto.getRoomTitle().length() > 14){
-            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","제목 양식에 맞지 않습니다."));
+        if (makeRoomRequestDto.getRoomTitle().length() < 2 || makeRoomRequestDto.getRoomTitle().length() > 14) {
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "제목 양식에 맞지 않습니다."));
         }
 
 
-        if(!makeRoomRequestDto.isStatus()&&!makeRoomRequestDto.getPassword().matches(Pattern)){
-            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","비밀번호 양식이 맞지않습니다."));
+        if (!makeRoomRequestDto.isStatus() && !makeRoomRequestDto.getPassword().matches(Pattern)) {
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "비밀번호 양식이 맞지않습니다."));
         }
 
         // 새로운 채팅방 생성
@@ -112,16 +112,16 @@ public class RoomService {
 
         List<RoomMemberResponseDto> roomMemberResponseDtoList = new ArrayList<>();
         // 채팅방 인원 추가
-        for (RoomMember roomMember : roomMemberList){
+        for (RoomMember roomMember : roomMemberList) {
             // 방장일 시
-            if (member != null){
+            if (member != null) {
                 roomMaster = Objects.equals(roomMember.getNickname(), member.getNickName());
             }
             // 방장이 아닐 시
             else {
                 roomMaster = false;
             }
-            roomMemberResponseDtoList.add(new RoomMemberResponseDto(roomMember,roomMaster));
+            roomMemberResponseDtoList.add(new RoomMemberResponseDto(roomMember, roomMaster));
 
         }
 
@@ -149,34 +149,25 @@ public class RoomService {
                 .build();
     }
 
-//    // 전체 방 조회하기
-//    public Page<Room> getAllRooms(int page) {
-//        PageRequest pageable = PageRequest.of(page-1,6);
-//
-//        Page<Room> allRooms = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
-//
-//        return allRooms;
-//    }
+    // 전체 방 조회하기
+    public Page<Room> getAllRooms(int page) {
+        PageRequest pageable = PageRequest.of(page - 1, 6);
+        return roomRepository.findAllByOrderByModifiedAtAsc(pageable);
+    }
 
     // 키워드로 채팅방 검색하기
     public Page<Room> searchRoom(String keyword, int page) {
-        PageRequest pageable = PageRequest.of(page-1,6);
+        PageRequest pageable = PageRequest.of(page - 1, 6);
 
         System.out.println(keyword);
-        Page<Room> searchRoom;
-        if (keyword == null || keyword.isBlank() || keyword.isEmpty()) {
-            searchRoom = roomRepository.findAllByOrderByModifiedAtAsc(pageable);
-            return searchRoom;
-        } else {
-            if (keyword.length() < 2 || keyword.length() >14){
-                throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","검색 양식에 맞지 않습니다."));
-            }
-            searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
+        Page<Room> searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
+        if (keyword.length() < 2 || keyword.length() > 14) {
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "검색 양식에 맞지 않습니다."));
         }
 
         // 검색 결과가 없다면
-        if (searchRoom.isEmpty()){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","검색 결과가 없습니다."));
+        if (searchRoom.isEmpty()) {
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "검색 결과가 없습니다."));
         }
 
         return searchRoom;
@@ -184,18 +175,18 @@ public class RoomService {
     }
 
     // 방장 방 나가기
-    public String outRoom(String sessionId, HttpServletRequest request){
+    public String outRoom(String sessionId, HttpServletRequest request) {
 
         //토큰 검증 및 멤버 객체 가져오기
         Member member = memberCheckUtils.checkMember(request);
 
         // 채팅방 찾기
         Room room = roomRepository.findById(sessionId).orElseThrow(
-                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","해당 방이 없습니다.")));
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "해당 방이 없습니다.")));
 
         // 방장인 지 확인
-        if (room.validateMember(member)){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방장이 아닙니다."));
+        if (room.validateMember(member)) {
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "방장이 아닙니다."));
         }
         roomRepository.delete(room);
 
@@ -203,44 +194,45 @@ public class RoomService {
     }
 
     // 방 접속
-    public RoomMemberResponseDto getRoomData(String SessionId, HttpServletRequest request, RoomPasswordRequestDto password) throws OpenViduJavaClientException, OpenViduHttpException {
+    public RoomMemberResponseDto getRoomData(String SessionId, HttpServletRequest request, RoomPasswordRequestDto
+            password) throws OpenViduJavaClientException, OpenViduHttpException {
 
         //토큰 검증 및 멤버 객체 가져오기
         Member member = memberCheckUtils.checkMember(request);
 
         // 방이 있는 지 확인
         Room room = roomRepository.findById(SessionId).orElseThrow(
-                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","해당 방이 없습니다.")));
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "해당 방이 없습니다.")));
 
         // 방에서 강퇴당한 멤버인지 확인
         BenMember benMember = benMemberRepository.findByMemberIdAndRoomId(member.getMemberId(), SessionId);
-        if(benMember != null){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","강퇴당한 방입니다."));
+        if (benMember != null) {
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "강퇴당한 방입니다."));
         }
         // 방 인원 초과 시
-        if (room.getCntMember() >= room.getMaxMember()){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 가득찼습니다."));
+        if (room.getCntMember() >= room.getMaxMember()) {
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "방이 가득찼습니다."));
         }
 
         // 룸 멤버 있는 지 확인
-        Optional<RoomMember> alreadyRoomMember = roomMemberRepository.findBySessionIdAndNickname(SessionId,member.getNickName());
-        if (alreadyRoomMember.isPresent()){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 입장한 멤버입니다."));
+        Optional<RoomMember> alreadyRoomMember = roomMemberRepository.findBySessionIdAndNickname(SessionId, member.getNickName());
+        if (alreadyRoomMember.isPresent()) {
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "이미 입장한 멤버입니다."));
         }
 
         // 방에 비밀번호 있는 지 확인
-        if (!room.isStatus()){  // 방이 private인 지 확인
-            if (null == password.getPassword()){    // 패스워드를 입력 안했을 때 에러 발생
+        if (!room.isStatus()) {  // 방이 private인 지 확인
+            if (null == password.getPassword()) {    // 패스워드를 입력 안했을 때 에러 발생
                 throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "비밀번호를 입력해주세요."));
             }
-            if (!room.getPassword().equals(password.getPassword())){  // 비밀번호가 틀리면 에러 발생
-                throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400", "비밀번호가 틀립니다."));
+            if (!room.getPassword().equals(password.getPassword())) {  // 비밀번호가 틀리면 에러 발생
+                throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "비밀번호가 틀립니다."));
             }
         }
 
 
         //채팅방 입장 시 토큰 발급
-        String enterRoomToken = enterRoomCreateSession(member,room.getSessionId());
+        String enterRoomToken = enterRoomCreateSession(member, room.getSessionId());
 
         // 채팅방 인원
         RoomMember roomMember = RoomMember.builder()
@@ -261,16 +253,16 @@ public class RoomService {
         List<RoomMemberResponseDto> roomMemberResponseDtoList = new ArrayList<>();
 
         // 채팅방 인원 추가
-        for (RoomMember addRoomMember : roomMemberList){
+        for (RoomMember addRoomMember : roomMemberList) {
             // 방장일 시
-            if (member != null){
+            if (member != null) {
                 roomMaster = Objects.equals(addRoomMember.getNickname(), member.getNickName());
             }
             // 방장이 아닐 시
             else {
                 roomMaster = false;
             }
-            roomMemberResponseDtoList.add(new RoomMemberResponseDto(addRoomMember,roomMaster));
+            roomMemberResponseDtoList.add(new RoomMemberResponseDto(addRoomMember, roomMaster));
 
         }
 
@@ -300,19 +292,19 @@ public class RoomService {
 
         // 방이 있는 지 확인
         Room room = roomRepository.findById(sessionId).orElseThrow(
-                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다."))
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "방이 존재하지않습니다."))
         );
 
         // 룸 멤버 찾기
-        RoomMember roomMember = roomMemberRepository.findBySessionIdAndNickname(sessionId,member.getNickName()).orElseThrow(
-                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방에 있는 멤버가 아닙니다."))
+        RoomMember roomMember = roomMemberRepository.findBySessionIdAndNickname(sessionId, member.getNickName()).orElseThrow(
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "방에 있는 멤버가 아닙니다."))
         );
 
         // 룸 멤버 삭제
         roomMemberRepository.delete(roomMember);
 
         // 룸 멤버 수 변경
-        room.updateCntMember(room.getCntMember() -1);
+        room.updateCntMember(room.getCntMember() - 1);
 
         // 룸 변경사항 저장
         roomRepository.save(room);
@@ -328,11 +320,11 @@ public class RoomService {
 
         // 채팅방 찾기
         Room room = roomRepository.findById(roomId).orElseThrow(
-                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다.")));
+                () -> new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "방이 존재하지않습니다.")));
 
         // 방장인 지 확인
-        if (room.validateMember(member)){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다."));
+        if (room.validateMember(member)) {
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "방이 존재하지않습니다."));
         }
 
         room.rename(roomTitle.getRoomTitle());
@@ -344,7 +336,8 @@ public class RoomService {
     }
 
     // 채팅방 생성 시 토큰 발급
-    private RoomCreateResponseDto createNewToken(Member member) throws OpenViduJavaClientException, OpenViduHttpException {
+    private RoomCreateResponseDto createNewToken(Member member) throws
+            OpenViduJavaClientException, OpenViduHttpException {
 
         // 사용자 연결 시 닉네임 전달
         String serverData = member.getNickName();
@@ -364,7 +357,8 @@ public class RoomService {
     }
 
     //채팅방 입장 시 토큰 발급
-    private String enterRoomCreateSession(Member member, String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+    private String enterRoomCreateSession(Member member, String sessionId) throws
+            OpenViduJavaClientException, OpenViduHttpException {
         String serverData = member.getNickName();
 
         //serverData을 사용하여 connectionProperties 객체를 빌드
@@ -387,15 +381,14 @@ public class RoomService {
                 break;
             }
         }
-        if (session == null){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","방이 존재하지않습니다."));
+        if (session == null) {
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "방이 존재하지않습니다."));
         }
 
         // 2. Openvidu에 유저 토큰 발급 요청 : 오픈비두 서버에 요청 유저가 타겟 채팅방에 입장할 수 있는 토큰을 발급 요청
         //토큰을 가져옴
         return session.createConnection(connectionProperties).getToken();
     }
-
 
 
 }
