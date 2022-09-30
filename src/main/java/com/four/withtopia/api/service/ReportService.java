@@ -12,6 +12,7 @@ import com.four.withtopia.dto.response.RoomMemberResponseDto;
 import com.four.withtopia.util.InsertImageUtil;
 import com.four.withtopia.util.MailUtils;
 import com.four.withtopia.util.MemberCheckUtils;
+import com.nimbusds.openid.connect.sdk.claims.SessionID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -43,7 +44,11 @@ public class ReportService {
         Member reportBy = memberCheckUtils.checkMember(request);
 
         Member reportTo = memberRepository.findByNickName(requestDto.getToNickname()).orElseThrow(()
-                -> new PrivateException(new ErrorCode(HttpStatus.OK,"200","해당 유저가 세션에 없습니다.")));
+                -> new PrivateException(new ErrorCode(HttpStatus.OK,"200","해당 유저가 없습니다.")));
+
+        if(reportBy.equals(reportTo)){
+            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","자신을 신고할 수 없습니다."));
+        }
 
         if(requestDto.getImage() != null){
             String imgUrl = insertImageUtil.insertImage(requestDto.getImage());
