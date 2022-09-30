@@ -151,12 +151,12 @@ public class RoomService {
 
     // 전체 방 조회하기
     public Page<Room> getAllRooms(int page) {
-        PageRequest pageable = PageRequest.of(page - 1, 6);
+        PageRequest pageable = PageRequest.of(page - 1, 8);
         return roomRepository.findByOrderByModifiedAtAsc(pageable);
     }
     // 키워드로 채팅방 검색하기
     public Page<Room> searchRoom(String keyword, int page) {
-        PageRequest pageable = PageRequest.of(page - 1, 6);
+        PageRequest pageable = PageRequest.of(page - 1, 8);
 
         Page<Room> searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
         if (keyword.length() < 2 || keyword.length() > 14) {
