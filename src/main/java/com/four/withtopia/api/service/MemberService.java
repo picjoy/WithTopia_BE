@@ -7,7 +7,6 @@ import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.ProfileImage;
 import com.four.withtopia.db.domain.RefreshToken;
-import com.four.withtopia.db.domain.Report;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.ProfileImageRepository;
 import com.four.withtopia.dto.request.GoogleUserInfoDto;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -137,25 +135,20 @@ public class MemberService {
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 존재하는 닉네임 입니다."));
         }
         if (requestDto.getNickname().length() < 2 || requestDto.getNickname().length() > 12) {
-        throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "닉네임 양식에 맞지 않습니다."));
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "닉네임 양식에 맞지 않습니다."));
         }
-//        if (requestDto.getAuthKey() == null) {
-//            return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
-//        }
-//        if (validationUtil.emailAuth(requestDto)) {
-//            return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
-//        }
+        if (requestDto.getAuthKey() == null) {
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "인증번호를 적어주세요"));
+        }
+        if (validationUtil.emailAuth(requestDto)) {
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "인증번호가 일치하지않습니다."));
+        }
         if (!(validationUtil.passwordCheck(requestDto))) {
            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","패스워드가 일치하지않습니다."));
         }
         List<ProfileImage> images = profileImageRepository.findAll();
         int randomInt = new Random().nextInt(images.size());
 
-//        Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()),profileImageRepository.getReferenceById((long) randomInt).getProfileIamge());
-//        List<String> img = new ArrayList<>();
-//        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/original.jpeg");
-//        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/winter.png");
-//        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/cat.png");
         Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()), images.get(randomInt).getProfileIamge());
 
         memberRepository.save(member);
