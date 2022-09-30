@@ -154,7 +154,6 @@ public class RoomService {
         PageRequest pageable = PageRequest.of(page - 1, 6);
         return roomRepository.findByOrderByModifiedAtAsc(pageable);
     }
-
     // 키워드로 채팅방 검색하기
     public Page<Room> searchRoom(String keyword, int page) {
         PageRequest pageable = PageRequest.of(page - 1, 6);
