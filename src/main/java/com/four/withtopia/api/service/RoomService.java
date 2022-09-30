@@ -152,14 +152,13 @@ public class RoomService {
     // 전체 방 조회하기
     public Page<Room> getAllRooms(int page) {
         PageRequest pageable = PageRequest.of(page - 1, 6);
-        return roomRepository.findAllByOrderByModifiedAtAsc(pageable);
+        return roomRepository.findByOrderByModifiedAtAsc(pageable);
     }
 
     // 키워드로 채팅방 검색하기
     public Page<Room> searchRoom(String keyword, int page) {
         PageRequest pageable = PageRequest.of(page - 1, 6);
 
-        System.out.println(keyword);
         Page<Room> searchRoom = roomRepository.findByRoomTitleContainingOrderByModifiedAtAsc(keyword, pageable);
         if (keyword.length() < 2 || keyword.length() > 14) {
             throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "검색 양식에 맞지 않습니다."));
@@ -167,7 +166,7 @@ public class RoomService {
 
         // 검색 결과가 없다면
         if (searchRoom.isEmpty()) {
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "400", "검색 결과가 없습니다."));
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "200", "검색 결과가 없습니다."));
         }
 
         return searchRoom;
