@@ -65,6 +65,7 @@ public class SecurityConfiguration {
                 .antMatchers("/endPoint2").permitAll()
                 .antMatchers("/rank/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/room/**").permitAll()
+                .antMatchers(HttpMethod.GET,"/rooms/**").permitAll()
                 .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/top").permitAll()
                 .antMatchers("/actuator/**").permitAll()
