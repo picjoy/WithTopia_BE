@@ -1,6 +1,8 @@
 package com.four.withtopia.db.domain;
 
+import com.four.withtopia.util.Timestamped;
 import lombok.*;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 
@@ -10,7 +12,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Vote {
+public class Vote extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,8 +21,12 @@ public class Vote {
     // 투표를 한 사람
     @Column
     private String voteBy;
+    @Column
+    private Long voteById;
 
     // 투표를 받을 사람
     @Column
     private String voteTo;
+    @Column
+    private Long voteToId;
 }
