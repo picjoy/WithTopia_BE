@@ -73,6 +73,8 @@ public class SecurityConfiguration {
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/chat/**").permitAll()
+                .antMatchers("/sub/**").permitAll()
+                .antMatchers("/topic/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService));
