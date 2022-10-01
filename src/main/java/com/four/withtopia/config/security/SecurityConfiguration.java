@@ -74,7 +74,6 @@ public class SecurityConfiguration {
                 .antMatchers("/swagger-resources/**").permitAll()
                 .antMatchers("/chat/**").permitAll()
                 .anyRequest().authenticated()
-
                 .and()
                 .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService));
 
