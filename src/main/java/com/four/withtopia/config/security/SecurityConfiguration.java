@@ -64,14 +64,20 @@ public class SecurityConfiguration {
                 .antMatchers("/endPoint1").permitAll()
                 .antMatchers("/endPoint2").permitAll()
                 .antMatchers("/rank/**").permitAll()
+                .antMatchers("/mypage/image").permitAll()
                 .antMatchers(HttpMethod.GET,"/room/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/rooms/**").permitAll()
                 .antMatchers("/swagger-ui/**").permitAll()
+                .antMatchers("/v3/api-docs").permitAll()
                 .antMatchers("/top").permitAll()
                 .antMatchers("/actuator/**").permitAll()
-
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/chat/**").permitAll()
+                .antMatchers("/sub/**").permitAll()
+                .antMatchers("/topic/**").permitAll()
+                .antMatchers("/wss/**").permitAll()
+                .antMatchers("/room/**").permitAll()
                 .anyRequest().authenticated()
-
                 .and()
                 .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService));
 
