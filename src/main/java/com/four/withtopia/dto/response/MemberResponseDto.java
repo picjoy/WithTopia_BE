@@ -25,17 +25,17 @@ public class MemberResponseDto {
             .profileImage(member.getProfileImage())
             .build();
   }
-  public static MemberResponseDto createSocialMemberResponseDto(Member member){
-
-    String nickname[] = member.getNickName().split("_");
-
-    return MemberResponseDto.builder()
-            .id(member.getMemberId())
-            .nickname(nickname[0])
-            .email(member.getEmail())
-            .profileImage(member.getProfileImage())
-            .build();
-  }
+//  public static MemberResponseDto createSocialMemberResponseDto(Member member){
+//
+//    String nickname[] = member.getNickName().split("_");
+//
+//    return MemberResponseDto.builder()
+//            .id(member.getMemberId())
+//            .nickname(nickname[0])
+//            .email(member.getEmail())
+//            .profileImage(member.getProfileImage())
+//            .build();
+//  }
 
   public static MemberResponseDto memberResponseDto(Member member){
     return MemberResponseDto.builder()
