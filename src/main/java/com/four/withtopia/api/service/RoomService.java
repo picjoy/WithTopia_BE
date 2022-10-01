@@ -152,7 +152,11 @@ public class RoomService {
     // 전체 방 조회하기
     public Page<Room> getAllRooms(int page) {
         PageRequest pageable = PageRequest.of(page - 1, 8);
-        return roomRepository.findByOrderByModifiedAtDesc(pageable);
+        Page<Room> roomlist = roomRepository.findByOrderByModifiedAtDesc(pageable);
+        if (roomlist.isEmpty()) {
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST, "200", "검색 결과가 없습니다."));
+        }
+        return roomlist;
     }
     // 키워드로 채팅방 검색하기
     public Page<Room> searchRoom(String keyword, int page) {
