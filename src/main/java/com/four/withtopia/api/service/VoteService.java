@@ -28,6 +28,9 @@ public class VoteService {
     public VoteResponseDto vote(VoteRequestDto requestDto, HttpServletRequest request){
         //토큰 검증 및 투표하는 멤버 객체 가져오기
         Member voteByMember = memberCheckUtils.checkMember(request);
+        Member voteToMember = memberRepository.findByNickName(requestDto.getNickname()).orElseThrow(
+                () -> new PrivateException(new ErrorCode(HttpStatus.NOT_FOUND, "404", "조회된 멤버가 없습니다."))
+        );
 
         // 자신에게 투표하지 못하게 막기
         if(voteByMember.getNickName().equals(requestDto.getNickname())){
@@ -35,7 +38,7 @@ public class VoteService {
         }
 
         // 이 멤버가 투표를 했는가? 만일 했다면 에러코드 발생
-        Vote checkVote = voteRepository.findByVoteByAndVoteTo(voteByMember.getNickName(), requestDto.getNickname());
+        Vote checkVote = voteRepository.findByVoteByIdAndVoteToId(voteByMember.getMemberId(), voteToMember.getMemberId());
         if(checkVote != null){
             throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","이미 투표를 완료했습니다."));
         }
@@ -44,45 +47,34 @@ public class VoteService {
         // 투표를 생성하고, 좋아요를 올린다.
         Vote vote = Vote.builder()
                 .voteBy(voteByMember.getNickName())
+                .voteById(voteByMember.getMemberId())
                 .voteTo(requestDto.getNickname())
+                .voteToId(voteToMember.getMemberId())
                 .build();
 
         voteRepository.save(vote);
 
-        // 투표 받는 멤버 찾기
-        Optional<Member> voteToMember = memberRepository.findByNickName(requestDto.getNickname());
-
-        // 투표 받는 멤버가 없다면 에러코드 발생
-        if(voteToMember == null || voteToMember.isEmpty()){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","조회된 멤버가 없습니다"));
-        }
-
         // 싫어요를 받으면 lick count 내리기
         if(!requestDto.isVote()){
-            if(voteToMember.get().getLikeCount() == 0){
+            if(voteToMember.getLikeCount() == 0){
                 // 인기도가 이미 0이라면
                 throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","더이상 내려갈 인기도가 없습니다."));
             }
-            Long likeCnt = voteToMember.get().getLikeCount()- 1;
-            VoteResponseDto responseDto = getVoteResponseDto(voteToMember, likeCnt);
-            return responseDto ;
+            Long likeCnt = voteToMember.getLikeCount()- 1;
+            return getVoteResponseDto(voteToMember, likeCnt);
         }
 
         // 좋아요를 받는다면 like count 올라가기
-        Long likeCnt = voteToMember.get().getLikeCount() + 1;
-        VoteResponseDto responseDto = getVoteResponseDto(voteToMember, likeCnt);
-        return  responseDto ;
+        Long likeCnt = voteToMember.getLikeCount() + 1;
+        return  getVoteResponseDto(voteToMember, likeCnt);
     }
 
-    private VoteResponseDto getVoteResponseDto(Optional<Member> voteToMember, Long likeCnt) {
-        if (voteToMember.isEmpty()){
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","멤버가 존재하지 않습니다."));
-        }
-        Member newMember = voteToMember.get();
-        newMember.updatePopularity(likeCnt);
-        memberRepository.save(newMember);
-        VoteResponseDto responseDto = VoteResponseDto.createVoteResponse(newMember);
-        return responseDto;
+    private VoteResponseDto getVoteResponseDto(Member voteToMember, Long likeCnt) {
+
+        voteToMember.updatePopularity(likeCnt);
+        memberRepository.save(voteToMember);
+
+        return VoteResponseDto.createVoteResponse(voteToMember);
     }
 
 }
