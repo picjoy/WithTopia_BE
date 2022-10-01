@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -63,8 +64,9 @@ public class SecurityConfiguration {
                 .antMatchers("/endPoint1").permitAll()
                 .antMatchers("/endPoint2").permitAll()
                 .antMatchers("/rank/**").permitAll()
+                .antMatchers(HttpMethod.GET,"/room/**").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/top").permitAll()
-
                 .anyRequest().authenticated()
 
                 .and()
