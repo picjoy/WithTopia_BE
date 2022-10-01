@@ -71,7 +71,7 @@ public class SecurityConfiguration {
                 .antMatchers("/v3/api-docs").permitAll()
                 .antMatchers("/top").permitAll()
                 .antMatchers("/actuator/**").permitAll()
-
+                .antMatchers("/swagger-resources/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
