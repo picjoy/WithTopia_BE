@@ -53,6 +53,7 @@ dependencies {
 //    Cookies
 //    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-zuul', version: '2.2.10.RELEASE'
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
 
     // 인증번호 유효시간 동안 저장
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
