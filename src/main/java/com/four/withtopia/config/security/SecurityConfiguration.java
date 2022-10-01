@@ -72,6 +72,7 @@ public class SecurityConfiguration {
                 .antMatchers("/top").permitAll()
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("/chat/**").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
