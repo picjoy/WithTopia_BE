@@ -58,10 +58,13 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeRequests()
 
+                .antMatchers("/member/email/**").permitAll()
                 .antMatchers("/member/**").permitAll()
-                .antMatchers("/post/**").permitAll()
-                .antMatchers("/comment/**").permitAll()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/endPoint1").permitAll()
+                .antMatchers("/endPoint2").permitAll()
+                .antMatchers("/rank/**").permitAll()
+                .antMatchers("/top").permitAll()
+
                 .anyRequest().authenticated()
 
                 .and()
