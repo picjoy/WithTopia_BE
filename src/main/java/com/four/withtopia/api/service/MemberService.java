@@ -87,9 +87,7 @@ public class MemberService {
     // 로그인 - 토큰 헤더에 넣어주기
     socialLogin(createMember, response);
     // MemberResponseDto
-    MemberResponseDto responseDto = MemberResponseDto.createSocialMemberResponseDto(createMember);
-
-    return responseDto;
+    return MemberResponseDto.createMemberResponseDto(createMember);
   }
 
 //  구글 로그인
@@ -103,9 +101,7 @@ public class MemberService {
     // 로그인 - 토큰 헤더에 넣어주기
     socialLogin(createMember, response);
     // MemberResponseDto
-    MemberResponseDto responseDto = MemberResponseDto.createSocialMemberResponseDto(createMember);
-
-    return responseDto;
+    return MemberResponseDto.createMemberResponseDto(createMember);
   }
 
   @Transactional(readOnly = true)
