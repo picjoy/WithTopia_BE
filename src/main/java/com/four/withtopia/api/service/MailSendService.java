@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -86,24 +87,7 @@ public class MailSendService {
         //6자리 난수 인증번호 생성
         String authKey = getKey(6);
         //인증메일 보내기
-        try {
-            MailUtils sendMail = new MailUtils(mailSender);
-            sendMail.setSubject("회원가입 이메일 인증");
-            sendMail.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
-                    .append("<img src='https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/Group+312.png' ")
-                    .append("<br>")
-                    .append("<p>인증 번호는 10분 뒤에 만료됩니다.</p>")
-                    .append("<p>아래 번호를 인증 창에 붙여넣어주세요.</p>")
-                    .append("<h1>-인증 번호-</h1>")
-                    .append("<h3>").append(authKey).append("</h3>")
-                    .append("<p>*인증번호 유효시간이 지난 경우 재발급해서 사용해주세요.</p>")
-                    .toString());
-            sendMail.setFrom("WithTopia", "Admin");
-            sendMail.setTo(email);
-            sendMail.send();
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","메일 발송에 실패했습니다."));
-        }
+        sendemail(email,authKey);
         EmailAuth emailAuth = new EmailAuth(email,authKey);
         // authKey : email 정보 저장
         EmailAuth origin = emailAuthRepository.findByEmail(emailAuth.getEmail());
@@ -125,5 +109,27 @@ public class MailSendService {
             }
         }
         return confirm;
+    }
+
+    @Async
+    public void sendemail(String email, String Authkey) {
+        try {
+            MailUtils sendMail = new MailUtils(mailSender);
+            sendMail.setSubject("회원가입 이메일 인증");
+            sendMail.setText(new StringBuffer().append("<h1>[이메일 인증]</h1>")
+                    .append("<img src='https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/Group+312.png' ")
+                    .append("<br>")
+                    .append("<p>인증 번호는 10분 뒤에 만료됩니다.</p>")
+                    .append("<p>아래 번호를 인증 창에 붙여넣어주세요.</p>")
+                    .append("<h1>-인증 번호-</h1>")
+                    .append("<h3>").append(Authkey).append("</h3>")
+                    .append("<p>*인증번호 유효시간이 지난 경우 재발급해서 사용해주세요.</p>")
+                    .toString());
+            sendMail.setFrom("WithTopia", "Admin");
+            sendMail.setTo(email);
+            sendMail.send();
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","메일 발송에 실패했습니다."));
+        }
     }
 }
