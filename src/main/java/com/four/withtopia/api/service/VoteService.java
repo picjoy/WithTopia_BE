@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +25,8 @@ public class VoteService {
 
     @Transactional
     public VoteResponseDto vote(VoteRequestDto requestDto, HttpServletRequest request){
+        System.out.println(requestDto.isVote());
+
         //토큰 검증 및 투표하는 멤버 객체 가져오기
         Member voteByMember = memberCheckUtils.checkMember(request);
         Member voteToMember = memberRepository.findByNickName(requestDto.getNickname()).orElseThrow(
