@@ -1,12 +1,11 @@
 package com.four.withtopia.api.service;
 
-import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
-@EnableScheduling
+@Component
 @RequiredArgsConstructor
 public class ScheduleService {
     private final VoteRepository voteRepository;
