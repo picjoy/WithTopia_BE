@@ -98,7 +98,7 @@
 ### 주요 기능 설명📍
 <details>
 <summary> <b>아키텍쳐 바로보기</b> </summary>
-    <img src="https://user-images.githubusercontent.com/103446802/193493437-d7c033fd-5754-4482-9f1e-e6252249a23d.png"> 
+    <img src="https://user-images.githubusercontent.com/103446802/194292784-61fc0f1c-7552-4f48-a2af-487fdfd70f90.jpeg"> 
 </details>
 
 ----
