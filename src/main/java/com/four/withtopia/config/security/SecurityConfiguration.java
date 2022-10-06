@@ -77,6 +77,7 @@ public class SecurityConfiguration {
                 .antMatchers("/topic/**").permitAll()
                 .antMatchers("/wss/**").permitAll()
                 .antMatchers("/room/**").permitAll()
+                .antMatchers("/report/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService));
