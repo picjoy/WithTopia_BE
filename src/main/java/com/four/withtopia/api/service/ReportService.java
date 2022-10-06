@@ -9,6 +9,7 @@ import com.four.withtopia.db.repository.ReportRepository;
 import com.four.withtopia.db.repository.RoomMemberRepository;
 import com.four.withtopia.dto.request.ReportRequestDto;
 import com.four.withtopia.dto.response.RoomMemberResponseDto;
+import com.four.withtopia.util.DuplicatedRequestUtil;
 import com.four.withtopia.util.InsertImageUtil;
 import com.four.withtopia.util.MailUtils;
 import com.four.withtopia.util.MemberCheckUtils;
@@ -36,6 +37,7 @@ public class ReportService {
     private final MemberCheckUtils memberCheckUtils;
     private final InsertImageUtil insertImageUtil;
     private final JavaMailSenderImpl mailSender;
+    private final DuplicatedRequestUtil duplicatedRequestUtil;
 
     @Transactional
     public String createReport(ReportRequestDto requestDto, HttpServletRequest request) throws IOException {
@@ -49,6 +51,12 @@ public class ReportService {
         if(reportBy.equals(reportTo)){
             throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","자신을 신고할 수 없습니다."));
         }
+
+        if(duplicatedRequestUtil.isDuplicatedRequest()){
+            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","중복으로 신고할 수 없습니다."));
+        }
+
+        duplicatedRequestUtil.save(reportBy.getMemberId());
 
         if(requestDto.getImage() != null){
             String imgUrl = insertImageUtil.insertImage(requestDto.getImage());
