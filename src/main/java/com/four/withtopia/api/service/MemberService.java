@@ -7,15 +7,12 @@ import com.four.withtopia.config.security.jwt.TokenProvider;
 import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.ProfileImage;
 import com.four.withtopia.db.domain.RefreshToken;
-import com.four.withtopia.db.domain.Report;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.ProfileImageRepository;
-import com.four.withtopia.dto.request.GoogleUserInfoDto;
-import com.four.withtopia.dto.request.KakaoUserInfoDto;
-import com.four.withtopia.dto.request.LoginRequestDto;
-import com.four.withtopia.dto.request.MemberRequestDto;
+import com.four.withtopia.dto.request.*;
 import com.four.withtopia.dto.response.MemberResponseDto;
 import com.four.withtopia.util.MemberCheckUtils;
+import com.four.withtopia.util.SocialMemberUtil;
 import com.four.withtopia.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -42,6 +38,8 @@ public class MemberService {
 
   private final MemberCheckUtils memberCheckUtils;
   private final ProfileImageRepository profileImageRepository;
+
+  private final SocialMemberUtil socialMemberUtil;
 
   @Transactional
   public MemberResponseDto login(LoginRequestDto requestDto, HttpServletResponse response) {
@@ -83,15 +81,13 @@ public class MemberService {
     // 인가코드 받아서 카카오 엑세스 토큰 받기
     String kakaoAccessToken = kakaoService.getKakaoAccessToken(code);
     // 카카오 엑세스 토큰으로 유저 정보 받아오기
-    KakaoUserInfoDto kakaoUserInfo = kakaoService.getKakaoUserInfo(kakaoAccessToken);
+    SocialUserInfoDto kakaoUserInfo = kakaoService.getKakaoUserInfo(kakaoAccessToken);
     // 회원가입 필요 시 회원 가입
-    Member createMember = kakaoService.createKakaoMember(kakaoUserInfo);
+    Member createMember = socialMemberUtil.createSocialMember(kakaoUserInfo);
     // 로그인 - 토큰 헤더에 넣어주기
     socialLogin(createMember, response);
     // MemberResponseDto
-    MemberResponseDto responseDto = MemberResponseDto.createSocialMemberResponseDto(createMember);
-
-    return responseDto;
+    return MemberResponseDto.createMemberResponseDto(createMember);
   }
 
 //  구글 로그인
@@ -99,15 +95,13 @@ public class MemberService {
     // 인가코드 받아서 구글 엑세스 토큰 받기
     String googleAccessToken = googleService.getGoogleAccessToken(code);
     // 구글 엑세스 토큰으로 유저 정보 받아오기
-    GoogleUserInfoDto googleUserInfo = googleService.getGoogleUserInfo(googleAccessToken);
+    SocialUserInfoDto googleUserInfo = googleService.getGoogleUserInfo(googleAccessToken);
     // 회원가입 필요시 회원가입
-    Member createMember = googleService.createGoogleMember(googleUserInfo);
+    Member createMember = socialMemberUtil.createSocialMember(googleUserInfo);
     // 로그인 - 토큰 헤더에 넣어주기
     socialLogin(createMember, response);
     // MemberResponseDto
-    MemberResponseDto responseDto = MemberResponseDto.createSocialMemberResponseDto(createMember);
-
-    return responseDto;
+    return MemberResponseDto.createMemberResponseDto(createMember);
   }
 
   @Transactional(readOnly = true)
@@ -136,23 +130,21 @@ public class MemberService {
         if (validationUtil.nicknameExist(requestDto.getNickname())) {
             throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","이미 존재하는 닉네임 입니다."));
         }
-//        if (requestDto.getAuthKey() == null) {
-//            return ResponseEntity.ok("이메일 인증번호를 적어주세요.");
-//        }
-//        if (validationUtil.emailAuth(requestDto)) {
-//            return ResponseEntity.ok("이메일 인증번호가 틀립니다.");
-//        }
+        if (requestDto.getNickname().length() < 2 || requestDto.getNickname().length() > 12) {
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "닉네임 양식에 맞지 않습니다."));
+        }
+        if (requestDto.getAuthKey() == null) {
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "인증번호를 적어주세요"));
+        }
+        if (validationUtil.emailAuth(requestDto)) {
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200", "인증번호가 일치하지않습니다."));
+        }
         if (!(validationUtil.passwordCheck(requestDto))) {
            throw new PrivateException(new ErrorCode(HttpStatus.BAD_REQUEST,"400","패스워드가 일치하지않습니다."));
         }
         List<ProfileImage> images = profileImageRepository.findAll();
         int randomInt = new Random().nextInt(images.size());
 
-//        Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()),profileImageRepository.getReferenceById((long) randomInt).getProfileIamge());
-//        List<String> img = new ArrayList<>();
-//        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/original.jpeg");
-//        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/winter.png");
-//        img.add("https://hanghae99-wonyoung.s3.ap-northeast-2.amazonaws.com/cat.png");
         Member member = new Member(requestDto, passwordEncoder.encode(requestDto.getPassword()), images.get(randomInt).getProfileIamge());
 
         memberRepository.save(member);

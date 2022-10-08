@@ -48,10 +48,24 @@ public class MypageService {
         // 토큰 검사
         Member member = memberCheckUtils.checkMember(request);
 
-        String Pattern =  "^[a-zA-Z\\d]{2,12}$";
+        // 만약 닉네임이 null이면
+        if(requestDto.getNickName()==null || requestDto.getNickName().isEmpty() || requestDto.getNickName().isBlank()){
+            requestDto.nicknameUpdateRequestDto(member.getNickName());
+            System.out.println("==========================================");
+            System.out.println(requestDto.getNickName());
+        }
 
-        if(!requestDto.getNickName().matches(Pattern)){
-            throw new PrivateException(new ErrorCode(HttpStatus.OK,"200","닉네임 양식에 맞지 않습니다."));
+        // 닉네임 양식 확인
+        if (requestDto.getNickName().length() < 2 || requestDto.getNickName().length()  > 6){
+            responseToken(response, request);
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","닉네임 양식에 맞지 않습니다."));
+        }
+
+        // 멤버 db에 동일한 닉네임이 있으면 예외
+        Member existsNickname = memberRepository.findByNickName(requestDto.getNickName()).orElse(null);
+        if(existsNickname != null && !Objects.equals(member.getMemberId(), existsNickname.getMemberId())){
+            responseToken(response, request);
+            throw new PrivateException(new ErrorCode(HttpStatus.OK, "200","동일한 닉네임이 이미 존재합니다."));
         }
 
         member.updateMember(requestDto, member);
@@ -66,6 +80,11 @@ public class MypageService {
         response.addHeader("RefreshToken", refreshToken);
 
         return responseDto;
+    }
+
+    private void responseToken(HttpServletResponse response, HttpServletRequest request) {
+        response.addHeader("Authorization", request.getHeader("Authorization"));
+        response.addHeader("RefreshToken", request.getHeader("RefreshToken"));
     }
 
     @Transactional

@@ -42,4 +42,14 @@ public class RoomMemberResponseDto {
         this.roomMaster = a;
     }
 
+    public RoomMemberResponseDto(RoomMember entity) {
+        this.roomMemberId = entity.getRoomMemberId();
+        this.sessionId = entity.getSessionId();
+        this.member = entity.getMember();
+        this.nickname = entity.getNickname();
+        this.email = entity.getEmail();
+        this.ProfileImage = entity.getProfileImage();
+        this.enterRoomToken = entity.getEnterRoomToken();
+        this.roomMaster = false;
+    }
 }

@@ -7,7 +7,8 @@ import com.four.withtopia.db.domain.Member;
 import com.four.withtopia.db.domain.ProfileImage;
 import com.four.withtopia.db.repository.MemberRepository;
 import com.four.withtopia.db.repository.ProfileImageRepository;
-import com.four.withtopia.dto.request.KakaoUserInfoDto;
+import com.four.withtopia.dto.request.SocialUserInfoDto;
+import com.four.withtopia.util.SocialMemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -27,9 +28,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class KakaoService {
-
-    private final MemberRepository memberRepository;
-    private final ProfileImageRepository profileImageRepository;
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}") private String CLIENT_ID; // rest APi 키
     @Value("${spring.security.oauth2.client.registration.kakao.client-secret}") private String CLIENT_SECRET ; // 시크릿 키
@@ -65,7 +63,7 @@ public class KakaoService {
     }
 
     // 카카오에서 유저 인포 받아오기
-    KakaoUserInfoDto getKakaoUserInfo(String kakaoAccessToken) throws JsonProcessingException {
+    SocialUserInfoDto getKakaoUserInfo(String kakaoAccessToken) throws JsonProcessingException {
         // Http 헤더
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + kakaoAccessToken);
@@ -85,38 +83,7 @@ public class KakaoService {
         System.out.println("responseBody = " + responseBody);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
-        return KakaoUserInfoDto.createKakaoUserInfo(jsonNode);
+        return SocialUserInfoDto.createKakaoUserInfo(jsonNode);
     }
 
-    // 필요시 회원가입 하기
-    @Transactional
-    Member createKakaoMember(KakaoUserInfoDto kakaoUserInfo) {
-        // DB 에 중복된 Kakao Id 가 있는지 확인
-        String kakaoUserId = kakaoUserInfo.getKakaoId();
-        Member kakaoUser = memberRepository.findByKakaoId(kakaoUserId);
-
-        // 없으면 회원가입 진행
-        if (kakaoUser == null) {
-            Member newMember = ConvertingKakaoUserToMember(kakaoUserInfo);
-            return memberRepository.save(newMember);
-        }
-
-        return kakaoUser;
-    }
-
-    // 카카오 유저를 우리 회원 양식으로 맞춰 넣기
-    public Member ConvertingKakaoUserToMember(KakaoUserInfoDto kakaoUserInfoDto){
-        // 유저네임에 랜덤한 id 붙여주기
-        String usernameId = UUID.randomUUID().toString();
-        // 유저 이미지를 랜덤하게 부여하기
-        List<ProfileImage> images = profileImageRepository.findAll();
-        int randomInt = new Random().nextInt(images.size());
-
-        return Member.builder()
-                .kakaoId(kakaoUserInfoDto.getKakaoId())
-                .nickName(kakaoUserInfoDto.getNickName() + "_kakao_" + usernameId)
-                .email(kakaoUserInfoDto.getEmail())
-                .profileImage(images.get(randomInt).getProfileIamge())
-                .build();
-    }
 }
