@@ -141,10 +141,10 @@
 ----
 
 ### Trouble Shooting📍
-##### Teouble 1
+##### Trouble 1
 방 생성 시 방이 곱절로 불러와지는 이슈
 - state 관리 상의 문제로 2번 저장되는 문제를 파악 => state 초기화 관리 함수 수정으로 해결
 
-##### Teouble 2
+##### Trouble 2
 Like 버튼 클릭 시 다른 기능이 호툴되는 이슈
 - 클릭 시 서버로 true/false가 아닌 null 값이 전달되는 문제를 파악 => state에 담지 않고 일반 상수값에 담아 사용하여 해결
